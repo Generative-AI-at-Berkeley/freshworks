@@ -46,6 +46,14 @@ docker compose logs -f ingest-mock
 docker compose down -v      # -v also deletes the database volume
 ```
 
+The dashboard container is behind a profile, so it only starts when asked:
+
+```sh
+docker compose --profile dashboard up -d --build --wait
+```
+
+For a walkthrough on synthetic data, use `pnpm demo` instead ([demo.md](demo.md)).
+
 Port already in use (a local Postgres, another project on 8080):
 
 ```sh

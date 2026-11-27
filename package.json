@@ -32,10 +32,14 @@
     "dev:api": "pnpm --filter @fwcoach/api dev",
     "check": "pnpm lint && pnpm lint:content && pnpm lint:deps && pnpm lint:rules && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
     "prepare": "husky",
-    "dev:dashboard": "pnpm --filter @fwcoach/contracts build && pnpm --filter @fwcoach/dashboard dev"
+    "dev:dashboard": "pnpm --filter @fwcoach/contracts build && pnpm --filter @fwcoach/dashboard dev",
+    "demo": "tsx --env-file-if-exists=.env --conditions=@fwcoach/source scripts/demo/main.ts up",
+    "demo:down": "tsx --env-file-if-exists=.env --conditions=@fwcoach/source scripts/demo/main.ts down"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@fwcoach/contracts": "workspace:*",
+    "@fwcoach/testkit": "workspace:*",
     "@next/eslint-plugin-next": "16.4.6",
     "@types/node": "^22.20.2",
     "@vitest/coverage-v8": "5.1.2",
@@ -51,7 +55,8 @@
     "tsx": "4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "8.74.0",
-    "vitest": "5.1.2"
+    "vitest": "5.1.2",
+    "zod": "4.6.7"
   },
   "lint-staged": {
     "*.{ts,js,mjs}": [
