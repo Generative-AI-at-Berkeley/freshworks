@@ -158,6 +158,9 @@
 
 .panel {
   grid-area: panel;
+  /* Contains absolutely positioned children (visually hidden labels), so they
+     scroll with the panel instead of stretching the document past the frame. */
+  position: relative;
   min-width: 0;
   overflow-y: auto;
   background: var(--color-fill-surface);
