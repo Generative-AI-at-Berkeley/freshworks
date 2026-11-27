@@ -11,7 +11,8 @@ import type pg from 'pg';
  * its own columns (ADR 0003).
  *
  * TODO(BE-3): implement, along with migrations for the tables it fills.
+ * Resolves to the number of rows written, which run-job.ts records.
  */
-export function rollupDay(_pool: pg.Pool, day: string): Promise<void> {
+export function rollupDay(_pool: pg.Pool, day: string): Promise<number> {
   return Promise.reject(new Error(`rollupDay(${day}) not implemented (BE-3)`));
 }

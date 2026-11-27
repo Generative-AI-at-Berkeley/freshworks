@@ -1,0 +1,75 @@
+# promtool test rules ops/alerts.test.yml. CI runs it next to `check rules`.
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: a failed job run alerts, a later success clears it
+    interval: 1m
+    input_series:
+      - series: 'fwcoach_job_last_run_timestamp_seconds{job="jobs",job_name="rollup"}'
+        values: '100 100 300 300'
+      - series: 'fwcoach_job_last_success_timestamp_seconds{job="jobs",job_name="rollup"}'
+        values: '100 100 100 300'
+    alert_rule_test:
+      - eval_time: 1m
+        alertname: FwcoachJobFailed
+        exp_alerts: []
+      - eval_time: 2m
+        alertname: FwcoachJobFailed
+        exp_alerts:
+          - exp_labels: { severity: ticket, job: jobs, job_name: rollup }
+            exp_annotations:
+              summary: 'The last rollup run failed.'
+              runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#job-failed
+      - eval_time: 3m
+        alertname: FwcoachJobFailed
+        exp_alerts: []
+
+  - name: a job that never succeeded alerts
+    interval: 1m
+    input_series:
+      - series: 'fwcoach_job_last_run_timestamp_seconds{job="jobs",job_name="retention"}'
+        values: '100'
+    alert_rule_test:
+      - eval_time: 0m
+        alertname: FwcoachJobFailed
+        exp_alerts:
+          - exp_labels: { severity: ticket, job: jobs, job_name: retention }
+            exp_annotations:
+              summary: 'The last retention run failed.'
+              runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#job-failed
+
+  - name: rejections above 1% alert after 15 minutes, a retry storm does not hide them
+    interval: 1m
+    input_series:
+      # 5 rejected and 95 accepted per minute: 5%. The duplicates would dilute
+      # it under 1% if they counted.
+      - series: 'fwcoach_ingest_records_total{job="ingest-mock",outcome="rejected"}'
+        values: '0+5x40'
+      - series: 'fwcoach_ingest_records_total{job="ingest-mock",outcome="accepted"}'
+        values: '0+95x40'
+      - series: 'fwcoach_ingest_records_total{job="ingest-mock",outcome="duplicate"}'
+        values: '0+1000x40'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: FwcoachIngestRejectionRate
+        exp_alerts: []
+      - eval_time: 35m
+        alertname: FwcoachIngestRejectionRate
+        exp_alerts:
+          - exp_labels: { severity: ticket }
+            exp_annotations:
+              summary: 'Ingest is rejecting 5% of records (target under 1%).'
+              runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#ingest-rejection-rate
+
+  - name: 501 stubs do not count as API errors
+    interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{job="api",route="/v1/fleet/health",status_code="501",method="GET"}'
+        values: '0+10x30'
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: FwcoachApiErrorRate
+        exp_alerts: []

@@ -11,6 +11,7 @@
 | [api.md](api.md)                                             | You build or call the query API                    |
 | [formats/](formats)                                          | You build or debug a harness adapter               |
 | [runbooks/](runbooks)                                        | You run the stack, or something broke              |
+| [observability.md](observability.md)                         | You add a metric or alert, or trace an error       |
 | [privacy/collection-notice.md](privacy/collection-notice.md) | You change what is collected                       |
 
 Docs change in the same PR as the code they describe. A PR that changes

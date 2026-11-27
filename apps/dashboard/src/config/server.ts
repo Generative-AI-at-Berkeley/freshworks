@@ -24,6 +24,11 @@ const Env = z
     DASHBOARD_DEV_ENGINEER: z.preprocess(blankAsUndefined, z.string().optional()),
     DASHBOARD_DEV_ORG_UNIT: z.preprocess(blankAsUndefined, z.string().optional()),
     DASHBOARD_DEV_ROLES: z.preprocess(blankAsUndefined, z.string().optional()),
+    /** How long the proxy waits for the API before answering 504. */
+    API_TIMEOUT_MS: z.preprocess(
+      blankAsUndefined,
+      z.coerce.number().int().positive().default(10_000),
+    ),
     /** Mirrors API_ALLOW_HEADER_AUTH: lets `next start` use the dev identity, for the compose demo. */
     DASHBOARD_ALLOW_DEV_IDENTITY: z
       .enum(['true', 'false'])
@@ -63,6 +68,7 @@ export type ServerConfig =
       devEngineer: string;
       devOrgUnit: string;
       devRoles: string | undefined;
+      apiTimeoutMs: number;
     };
 
 export function loadServerConfig(source: NodeJS.ProcessEnv = process.env): ServerConfig {
@@ -80,5 +86,14 @@ export function loadServerConfig(source: NodeJS.ProcessEnv = process.env): Serve
     devEngineer: env.DASHBOARD_DEV_ENGINEER,
     devOrgUnit: env.DASHBOARD_DEV_ORG_UNIT,
     devRoles: env.DASHBOARD_DEV_ROLES,
+    apiTimeoutMs: env.API_TIMEOUT_MS,
   };
+}
+
+/**
+ * `next dev` needs a looser CSP than `next start` (React's dev tooling uses
+ * eval). Separate from loadServerConfig so a bad API setting never drops the CSP.
+ */
+export function isDevelopment(source: NodeJS.ProcessEnv = process.env): boolean {
+  return source.NODE_ENV === 'development';
 }

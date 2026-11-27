@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 import type { ReactNode } from 'react';
 
 import '@freshworks/dew-styles/colors.css';
@@ -24,14 +25,16 @@ export const metadata: Metadata = {
   description: 'How engineering teams use AI coding tools, and which skills are catching on.',
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  // Set per request by src/proxy.ts. The CSP blocks this inline script without it.
+  const nonce = (await headers()).get('x-nonce') ?? undefined;
   return (
     // The init script swaps the theme class before React hydrates, on purpose,
     // so a dark-mode visitor never sees a light flash. This attribute tells
     // React that one mismatch on <html> is expected. It does not cover children.
     <html lang="en" className={DEW_THEME_CLASS[Theme.Light]} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         {/* Static on purpose: the bundler cannot parse this file. See scripts/copy-dew-fonts.mjs. */}
         {/* eslint-disable-next-line @next/next/no-css-tags */}
         <link rel="stylesheet" href="/dew/fonts.css" />

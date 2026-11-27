@@ -23,9 +23,11 @@ pnpm dev:api               # query API on :8080, reloads on change
 Try them:
 
 ```sh
-curl localhost:4318/healthz
+curl localhost:4318/readyz
 curl localhost:8080/readyz
 curl -H 'X-Dev-Engineer: E1' localhost:8080/v1/me/data
+curl localhost:9464/metrics    # API metrics, own port, localhost only
+curl localhost:9465/metrics    # ingest-mock metrics
 ```
 
 The last one answers 501 until BE-2 serves the route. A 501 names the ticket
@@ -41,6 +43,12 @@ pnpm --filter @fwcoach/collector dry-run    # prints the OTLP request, sends not
 Every `dev`, `dry-run`, `status` and `job` script loads the root `.env` with
 `--env-file-if-exists`. Variables already exported in your shell win.
 
+`NODE_ENV=development` in `.env` is what lets the API use header auth. Without
+it the API treats the run as production and exits with
+`API_AUTH_MODE=local is refused when NODE_ENV=production`. An `.env` copied
+before this change needs the line added. `API_ALLOW_HEADER_AUTH=true` only
+helps under a non-production `NODE_ENV` such as the compose stack's `staging`.
+
 ## Whole stack in containers
 
 ```sh
@@ -53,6 +61,13 @@ The dashboard container is behind a profile, so it only starts when asked:
 
 ```sh
 docker compose --profile dashboard up -d --build --wait
+```
+
+Prometheus and Grafana are behind the `observability` profile
+([observability.md](../observability.md#see-it-locally)):
+
+```sh
+docker compose --profile observability up -d --build --wait
 ```
 
 For a walkthrough on synthetic data, use `pnpm demo` instead ([demo.md](demo.md)).

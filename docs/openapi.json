@@ -1458,12 +1458,21 @@
       "Problem": {
         "type": "object",
         "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
           "status": {
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
           },
           "detail": {
+            "type": "string"
+          },
+          "requestId": {
             "type": "string"
           }
         },

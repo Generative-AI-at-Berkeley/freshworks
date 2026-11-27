@@ -16,6 +16,9 @@ marked `x-status: draft`.
 | `oidc`  | Bearer token from the corporate IdP. `sub` maps to `engineer.sso_subject`. | Anywhere real. TODO(BE-2).                                                                                                                       |
 | `local` | `X-Dev-Engineer: <employee id>`, optional `X-Dev-Roles: platform_admin`    | Only when `NODE_ENV` is `development` or `test`, or with `API_ALLOW_HEADER_AUTH=true` (the compose demo, bound to localhost). Refused otherwise. |
 
+An unset `NODE_ENV` counts as `production`. `local` is refused in production
+whatever `API_ALLOW_HEADER_AUTH` says, and the API exits at startup with the reason.
+
 Roles: `engineer` (everyone), `manager` (derived from `manager_edge` on the
 date viewed, never assigned and never claimable by header), `platform_admin`.
 
@@ -39,8 +42,20 @@ Data reads go through `withCaller` in `src/db.ts`.
 
 ## Conventions
 
-- Errors are `application/problem+json`: `{ "status": 403, "detail": "..." }`.
-  `detail` says what broke and what to do.
+- Errors are `application/problem+json` (RFC 9457):
+  `{ "type": "about:blank", "title": "Forbidden", "status": 403, "detail": "...", "requestId": "..." }`.
+  `requestId` matches the `X-Request-ID` response header and the API's log line
+  ([observability.md](observability.md#request-ids)).
+  `detail` says what broke and what to do. Build bodies with `api.problem()`
+  from `packages/contracts`. Unknown routes are a 404 problem. A 5xx never
+  carries the underlying error message; that goes to the log.
+- Limits (all in `src/config.ts`, `API_*` variables): 64 KiB bodies, 30s to
+  receive a request, and 600 requests per caller per minute under `/v1` (429
+  with `Retry-After`). The rate limit counts in memory, per instance. Move it
+  to a shared store before running more than one instance.
+- No CORS: only the dashboard's server calls the API. Helmet sets nosniff,
+  `X-Frame-Options: DENY` and `Referrer-Policy: no-referrer`. HSTS only with
+  `API_HSTS=true`, for when TLS terminates in front of the API.
 - Dates are UTC days as `YYYY-MM-DD`. Ranges are `from` inclusive, `to` exclusive.
 - Every cost comes with its coverage: `{ "costUsd": 1234.5, "costCoverage": 0.82 }`.
   `costUsd` is `null` when nothing could be priced.

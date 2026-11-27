@@ -15,11 +15,18 @@ export class ApiError extends Error {
   }
 }
 
-/** Pull the sentence out of a problem+json body, the shape every API and proxy error uses. */
+/**
+ * Pull the sentence out of a problem+json body, the shape every API and proxy
+ * error uses. The request ID goes on the end so a reported error can be found
+ * in the API logs.
+ */
 export function parseError(body: string, status: number, path: string): ApiError {
   try {
     const problem = api.Problem.safeParse(JSON.parse(body));
-    if (problem.success) return new ApiError(problem.data.detail, status);
+    if (problem.success) {
+      const { detail, requestId } = problem.data;
+      return new ApiError(requestId ? `${detail} Request ID ${requestId}.` : detail, status);
+    }
   } catch {
     // Not JSON. Fall through to a generic sentence.
   }

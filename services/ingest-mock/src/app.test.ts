@@ -5,6 +5,7 @@ import { encodeBatch, TelemetryEvent } from '@fwcoach/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { buildApp } from './app.js';
+import { buildMetricsApp, createMetrics } from './metrics.js';
 import { MemoryEventStore } from './store/memory-store.js';
 
 const require = createRequire(import.meta.url);
@@ -54,4 +55,123 @@ describe('POST /v1/logs', () => {
   });
 
   it.todo('answers 429 with Retry-After past the burst limit (BE-1)');
+});
+
+describe('ingest observability', () => {
+  it('keeps the bearer token and the event body out of the logs', async () => {
+    const lines: string[] = [];
+    const token = 'dev_SECRET_TOKEN_123';
+    const app = buildApp({
+      store: new MemoryEventStore(),
+      logStream: { write: (line) => void lines.push(line) },
+    });
+    const res = await app.inject({
+      method: 'POST',
+      url: '/v1/logs',
+      headers: { authorization: `Bearer ${token}` },
+      payload: batch,
+    });
+    expect(res.statusCode).toBe(200);
+    app.log.info({ headers: { authorization: `Bearer ${token}` }, body: batch }, 'direct');
+
+    const output = lines.join('');
+    expect(output).toContain('batch stored');
+    expect(output).not.toContain(token);
+    const encoded = batch.resourceLogs[0]!.scopeLogs[0]!.logRecords[0]!.body.bytesValue;
+    expect(output).not.toContain(encoded.slice(0, 24));
+    expect(output).not.toContain(event.event_id);
+  });
+
+  it('counts accepted, duplicate and rejected records, and returns the request ID', async () => {
+    const metrics = createMetrics();
+    const app = buildApp({ store: new MemoryEventStore(), logger: false, metrics });
+    const bad = structuredClone(batch);
+    bad.resourceLogs[0]!.scopeLogs[0]!.logRecords.push({
+      timeUnixNano: '0',
+      body: { bytesValue: Buffer.from('{}').toString('base64') },
+    });
+    await app.inject({ method: 'POST', url: '/v1/logs', headers: auth, payload: batch });
+    await app.inject({ method: 'POST', url: '/v1/logs', headers: auth, payload: bad });
+    const unauthorized = await app.inject({ method: 'POST', url: '/v1/logs', payload: batch });
+    expect(unauthorized.json()).toMatchObject({
+      status: 401,
+      requestId: unauthorized.headers['x-request-id'],
+    });
+    expect((await app.inject('/metrics')).statusCode).toBe(404);
+
+    const text = (await buildMetricsApp(metrics.registry).inject('/metrics')).body;
+    expect(text).toContain('fwcoach_ingest_records_total{outcome="accepted"} 1');
+    expect(text).toContain('fwcoach_ingest_records_total{outcome="duplicate"} 1');
+    expect(text).toContain('fwcoach_ingest_records_total{outcome="rejected"} 1');
+    expect(text).toContain(
+      'http_server_request_duration_seconds_count{method="POST",route="/v1/logs",status_code="401"} 1',
+    );
+  });
+});
+
+describe('errors and probes', () => {
+  it('is ready', async () => {
+    const app = buildApp({ store: new MemoryEventStore(), logger: false });
+    expect((await app.inject('/readyz')).json()).toEqual({ status: 'ok' });
+  });
+
+  it('answers an unknown route with a 404 problem', async () => {
+    const app = buildApp({ store: new MemoryEventStore(), logger: false });
+    const res = await app.inject('/v1/traces');
+    expect(res.statusCode).toBe(404);
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(res.json()).toMatchObject({
+      type: 'about:blank',
+      title: 'Not Found',
+      status: 404,
+      requestId: res.headers['x-request-id'],
+    });
+  });
+
+  it('answers malformed JSON with a 400 problem', async () => {
+    const app = buildApp({ store: new MemoryEventStore(), logger: false });
+    const res = await app.inject({
+      method: 'POST',
+      url: '/v1/logs',
+      headers: { ...auth, 'content-type': 'application/json' },
+      payload: '{not json',
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json()).toMatchObject({
+      status: 400,
+      title: 'Bad Request',
+      requestId: res.headers['x-request-id'],
+    });
+  });
+
+  it('hides the message when the store fails', async () => {
+    const store = {
+      store: () => Promise.reject(new Error('connection to db-internal refused')),
+    };
+    const app = buildApp({ store, logger: false });
+    const res = await app.inject({
+      method: 'POST',
+      url: '/v1/logs',
+      headers: auth,
+      payload: batch,
+    });
+    expect(res.statusCode).toBe(500);
+    expect(res.body).not.toContain('db-internal');
+    expect(res.json()).toMatchObject({
+      status: 500,
+      title: 'Internal Server Error',
+      requestId: res.headers['x-request-id'],
+    });
+  });
+
+  it('sets server timeouts from config', () => {
+    const app = buildApp({
+      store: new MemoryEventStore(),
+      logger: false,
+      timeouts: { requestTimeoutMs: 1000, connectionTimeoutMs: 2000, keepAliveTimeoutMs: 3000 },
+    });
+    expect(app.server.requestTimeout).toBe(1000);
+    expect(app.server.timeout).toBe(2000);
+    expect(app.server.keepAliveTimeout).toBe(3000);
+  });
 });

@@ -1,0 +1,104 @@
+# Prometheus alert rules. Thresholds are proposed, not agreed: see
+# docs/observability.md. CI checks this file with promtool.
+# Each alert links its section in docs/runbooks/failure-modes.md.
+
+groups:
+  - name: fwcoach-api
+    rules:
+      - alert: FwcoachApiErrorRate
+        # 501 is excluded: every route answers 501 until its ticket lands.
+        expr: |
+          sum(rate(http_server_request_duration_seconds_count{job="api",status_code=~"5..",status_code!="501"}[5m]))
+            / sum(rate(http_server_request_duration_seconds_count{job="api"}[5m]))
+            > 0.01
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: 'API 5xx rate is {{ $value | humanizePercentage }} over 5 minutes (target under 1%).'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#api-error-rate
+
+      - alert: FwcoachApiLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(http_server_request_duration_seconds_bucket{job="api",route!="unmatched"}[5m]))
+          ) > 0.5
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: 'API p95 latency is {{ $value | humanizeDuration }} (target under 500ms).'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#api-latency
+
+      - alert: FwcoachPgPoolSaturated
+        expr: max_over_time(fwcoach_pg_pool_waiting_clients[5m]) > 0
+        for: 10m
+        labels:
+          severity: ticket
+        annotations:
+          summary: 'Queries have waited for a Postgres connection for 10 minutes.'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#postgres-pool-saturated
+
+      - alert: FwcoachTargetDown
+        expr: up{job=~"api|ingest-mock"} == 0
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: '{{ $labels.job }} has not answered a metrics scrape for 5 minutes.'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#service-down
+
+  - name: fwcoach-ingest
+    rules:
+      - alert: FwcoachIngestRejectionRate
+        # Duplicates are left out of the denominator: they are retries of
+        # records already counted, and a retry storm would hide a spike.
+        expr: |
+          sum(rate(fwcoach_ingest_records_total{outcome="rejected"}[15m]))
+            / sum(rate(fwcoach_ingest_records_total{outcome!="duplicate"}[15m]))
+            > 0.01
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: 'Ingest is rejecting {{ $value | humanizePercentage }} of records (target under 1%).'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#ingest-rejection-rate
+
+  - name: fwcoach-jobs
+    rules:
+      - alert: FwcoachJobFailed
+        # The last run failed, or no run has ever succeeded.
+        expr: |
+          fwcoach_job_last_run_timestamp_seconds > fwcoach_job_last_success_timestamp_seconds
+            or (fwcoach_job_last_run_timestamp_seconds unless fwcoach_job_last_success_timestamp_seconds)
+        labels:
+          severity: ticket
+        annotations:
+          summary: 'The last {{ $labels.job_name }} run failed.'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#job-failed
+
+      - alert: FwcoachRollupStale
+        expr: time() - fwcoach_job_last_success_timestamp_seconds{job_name="rollup"} > 26 * 3600
+        labels:
+          severity: ticket
+        annotations:
+          summary: 'The rollup job has not succeeded for {{ $value | humanizeDuration }} (target under 26h).'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#job-not-succeeding
+
+      - alert: FwcoachRetentionStale
+        expr: time() - fwcoach_job_last_success_timestamp_seconds{job_name="retention"} > 8 * 86400
+        labels:
+          severity: ticket
+        annotations:
+          summary: 'The retention job has not succeeded for {{ $value | humanizeDuration }} (target under 8 days).'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#job-not-succeeding
+
+      - alert: FwcoachDataStale
+        # data_through is the end of the newest rolled-up day. A nightly rollup
+        # of yesterday keeps the lag between 24h and about 26h.
+        expr: time() - max(fwcoach_job_data_through_timestamp_seconds{job_name="rollup"}) > 48 * 3600
+        labels:
+          severity: page
+        annotations:
+          summary: 'Dashboards show data {{ $value | humanizeDuration }} old (target under 36h).'
+          runbook_url: https://github.com/Generative-AI-at-Berkeley/fwcoach/blob/main/docs/runbooks/failure-modes.md#data-stale

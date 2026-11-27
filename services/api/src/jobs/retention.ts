@@ -9,9 +9,10 @@ import type pg from 'pg';
  * events are partitioned by month on occurred_at.
  *
  * TODO(BE-1): implement, with a dry-run flag that lists what would be dropped.
+ * Resolves to the number of rows purged, which run-job.ts records.
  */
 export const DETAIL_RETENTION_MONTHS = 13;
 
-export function applyRetention(_pool: pg.Pool, _now: Date): Promise<void> {
+export function applyRetention(_pool: pg.Pool, _now: Date): Promise<number> {
   return Promise.reject(new Error('applyRetention not implemented (BE-1)'));
 }
