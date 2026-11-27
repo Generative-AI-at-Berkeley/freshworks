@@ -28,6 +28,9 @@ curl localhost:8080/readyz
 curl -H 'X-Dev-Engineer: E1' localhost:8080/v1/me/data
 ```
 
+The last one answers 501 until BE-2 serves the route. A 501 names the ticket
+that owns it.
+
 Collector:
 
 ```sh

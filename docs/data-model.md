@@ -73,6 +73,21 @@ erDiagram
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `access_log` | `viewer_id`, `subject_id`, `route`, `viewed_at`. Written in the same transaction as every individual-detail read. Readable by platform admins only. Not subject to the 13-month purge without a separate decision. |
 
+### Rejection reasons today
+
+The `reason` values above are the plan. What the code does today, for BE-1 to
+map:
+
+| Case                             | What happens now                                       | Planned `reason`                                           |
+| -------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
+| `body.bytesValue` is not base64  | Record rejected, error `body.bytesValue is not base64` | `not_base64`                                               |
+| Base64 that is not JSON          | Record rejected, error `body is not base64 JSON`       | None fits. BE-1 decides, likely `invalid_schema`.          |
+| JSON that fails the event schema | Record rejected with the Zod error                     | `invalid_schema`                                           |
+| Request body over 5 MiB          | Whole request refused with 413, no per-record result   | `too_large` can only be recorded per batch, not per record |
+
+Rejected records come back in the OTLP `partialSuccess` field of the
+response. Nothing writes `ingest_rejection` yet (BE-1).
+
 ## Access control in the database
 
 Row-level security on every table with per-engineer rows. The API sets

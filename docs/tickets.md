@@ -143,3 +143,25 @@ the backend routes land. Response shapes are drafts in
 
 - Code: `apps/dashboard`, `packages/contracts/src/api`
 - Done: all four views render in Dew against the compose stack, and every number matches the API for the same range.
+
+## Not yet owned
+
+Work the spec or an ADR requires that no ticket covers. Each needs an owner
+before it is built.
+
+### Offboarding purge (proposed)
+
+ADR 0006 says a departed employee's detail is purged at offboarding,
+whatever its age. Nothing does this yet. The retention job (BE-1) drops whole
+partitions by age, so it cannot remove one person's rows.
+
+- What: a scheduled job that finds engineers with `departed_at` set and
+  deletes their raw events, session facts and per-engineer rollup rows, and
+  keeps aggregates that no longer name them. Dry run first, like retention.
+  It records what it removed, without the removed content.
+- Open questions: how soon after `departed_at` it runs, whether `access_log`
+  rows about them are kept (ADR 0006 leaves `access_log` out of the purge),
+  and who confirms the directory export is right before it deletes.
+- Likely owner: BE-1 (retention) or BE-2 (identity). Needs a decision.
+- Done: a departed engineer in the test data has no detail rows after the
+  job, team totals for past days are unchanged, and a re-run deletes nothing.

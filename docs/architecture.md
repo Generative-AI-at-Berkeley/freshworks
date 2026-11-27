@@ -71,8 +71,9 @@ If the shape changes, it changes here first, with both teams reviewing.
 
 In production this is the Freshworks telemetry pipeline, which we do not run
 or change. Here it is `services/ingest-mock`, which accepts the same OTLP
-payload, auth header and limits, and writes raw events to Postgres so the
-rest of the backend has real input. New fields go to Freshworks as a proposal
+payload, auth header and limits. Today it keeps accepted events in memory
+(`MemoryEventStore`), so nothing downstream sees them yet. BE-1 moves it to
+Postgres so the rest of the backend has real input. New fields go to Freshworks as a proposal
 ([contracts/proposed-fields.md](contracts/proposed-fields.md)).
 
 ### Storage, rollups, API (`db`, `services/api`)
