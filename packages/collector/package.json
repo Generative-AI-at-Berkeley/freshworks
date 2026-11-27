@@ -1,0 +1,29 @@
+{
+  "name": "@fwcoach/collector",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Local collector agent. Reads harness data on the engineer's machine, applies the content policy, buffers, and uploads in the v2 payload format.",
+  "type": "module",
+  "bin": {
+    "fwcoach": "./dist/main.js"
+  },
+  "exports": {
+    ".": {
+      "@fwcoach/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx --env-file-if-exists=../../.env --conditions=@fwcoach/source src/main.ts run",
+    "dry-run": "tsx --env-file-if-exists=../../.env --conditions=@fwcoach/source src/main.ts run --dry-run",
+    "status": "tsx --env-file-if-exists=../../.env --conditions=@fwcoach/source src/main.ts status"
+  },
+  "dependencies": {
+    "@fwcoach/contracts": "workspace:*",
+    "pino": "10.4.0",
+    "zod": "4.6.7"
+  }
+}

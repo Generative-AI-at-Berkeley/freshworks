@@ -1,0 +1,44 @@
+{
+  "schema": "fw.ai_builder.event",
+  "schema_version": "2.0",
+  "event_id": "6256b60a-c4b4-4a12-b9ed-abacbfdcdd67",
+  "event_type": "agent_invoked",
+  "occurred_at": "2026-10-07T11:40:26.000Z",
+  "sent_at": "2026-10-07T11:45:02.118Z",
+  "msg": "agent invoked: general-purpose",
+  "source": {
+    "agent_version": "0.1.0",
+    "hook_version": 6,
+    "ide": "claude-code",
+    "ide_version": null,
+    "surface": null
+  },
+  "device": {
+    "device_id": "dev_SYNTHETIC0001",
+    "machine_id": null,
+    "os": "darwin",
+    "os_version": "25.5.0"
+  },
+  "session": {
+    "conversation_id": null,
+    "prompt_id": "00000000-0000-4000-8000-0000000000a1",
+    "session_id": "00000000-0000-4000-8000-000000000001",
+    "source": null
+  },
+  "model": { "id": null, "name": null, "resolved": null, "session": null },
+  "repo": { "name": "example-repo" },
+  "pdlc": { "active": false },
+  "data": {
+    "artifact": { "name": "general-purpose", "resolved": false, "type": "agents" },
+    "invocation": { "source": "tool" },
+    "subagent": {
+      "duration_ms": 4685,
+      "model": "example-model",
+      "status": "completed",
+      "tokens": 25979,
+      "tool_calls": 0
+    },
+    "tool": { "name": "Agent" }
+  },
+  "ext": {}
+}

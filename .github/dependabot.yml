@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps
+    open-pull-requests-limit: 5
+    groups:
+      # One PR for routine bumps instead of twenty.
+      minor-and-patch:
+        update-types: [minor, patch]
+    ignore:
+      # typescript-eslint does not support TypeScript 7 yet. Lift this when it does.
+      - dependency-name: typescript
+        update-types: [version-update:semver-major]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']
+
+  # Postgres and dbmate images in docker-compose.yml. The Dockerfile's base
+  # image is pinned through NODE_VERSION, which Dependabot cannot follow, so
+  # bump it by hand with .nvmrc.
+  - package-ecosystem: docker-compose
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps

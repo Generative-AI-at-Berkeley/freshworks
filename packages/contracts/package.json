@@ -1,0 +1,27 @@
+{
+  "name": "@fwcoach/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The v2 telemetry payload as Zod schemas, plus the OTLP wire encoding. The single source of truth both teams build against.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@fwcoach/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./fixtures/*": "./fixtures/*"
+  },
+  "files": [
+    "dist",
+    "fixtures"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "uuid": "14.0.3",
+    "zod": "4.6.7"
+  }
+}

@@ -1,0 +1,93 @@
+# Local dev and the staging demo. Everything here is synthetic and local.
+#   docker compose up -d --wait          whole stack
+#   docker compose up -d postgres        just the database (pnpm dev:infra)
+
+name: fwcoach
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: fwcoach
+      POSTGRES_PASSWORD: fwcoach
+      POSTGRES_DB: fwcoach
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U fwcoach -d fwcoach']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: ghcr.io/amacneil/dbmate:2.38
+    command: --wait --no-dump-schema up
+    environment:
+      DBMATE_MIGRATIONS_DIR: /db/migrations
+      DATABASE_URL: postgres://fwcoach:fwcoach@postgres:5432/fwcoach?sslmode=disable
+    volumes:
+      - ./db/migrations:/db/migrations:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ingest-mock:
+    build:
+      context: .
+      args:
+        SERVICE: ingest-mock
+    environment:
+      INGEST_PORT: '4318'
+      APP_DATABASE_URL: postgres://fwcoach_api:fwcoach_api@postgres:5432/fwcoach?sslmode=disable
+    ports:
+      - '127.0.0.1:${INGEST_PORT:-4318}:4318'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:4318/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      args:
+        SERVICE: api
+    environment:
+      API_PORT: '8080'
+      # Header auth for the local demo. Ports bind to 127.0.0.1 only, so
+      # nobody else on your network can reach it.
+      NODE_ENV: staging
+      API_AUTH_MODE: local
+      API_ALLOW_HEADER_AUTH: 'true'
+      APP_DATABASE_URL: postgres://fwcoach_api:fwcoach_api@postgres:5432/fwcoach?sslmode=disable
+    ports:
+      - '127.0.0.1:${API_PORT:-8080}:8080'
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:8080/readyz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:

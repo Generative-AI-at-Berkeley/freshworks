@@ -1,0 +1,26 @@
+{
+  "name": "@fwcoach/api",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Query API, rollup jobs and directory sync over self-hosted Postgres.",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsx watch --env-file-if-exists=../../.env --conditions=@fwcoach/source src/main.ts",
+    "start": "node dist/main.js",
+    "job": "tsx --env-file-if-exists=../../.env --conditions=@fwcoach/source src/jobs/cli.ts"
+  },
+  "dependencies": {
+    "@fwcoach/contracts": "workspace:*",
+    "fastify": "5.12.8",
+    "pg": "8.23.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "@types/pg": "8.23.1"
+  },
+  "files": [
+    "dist"
+  ]
+}

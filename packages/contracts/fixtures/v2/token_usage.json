@@ -1,0 +1,40 @@
+{
+  "schema": "fw.ai_builder.event",
+  "schema_version": "2.0",
+  "event_id": "e4146229-55fe-4538-9b6c-7392dc7cef4a",
+  "event_type": "token_usage",
+  "occurred_at": "2026-10-07T11:40:26.000Z",
+  "sent_at": "2026-10-07T11:45:02.118Z",
+  "msg": "token_usage",
+  "source": {
+    "agent_version": "0.1.0",
+    "hook_version": 6,
+    "ide": "cursor",
+    "ide_version": "3.17.21",
+    "surface": null
+  },
+  "device": {
+    "device_id": "dev_SYNTHETIC0001",
+    "machine_id": null,
+    "os": "darwin",
+    "os_version": "25.5.0"
+  },
+  "session": {
+    "conversation_id": "00000000-0000-4000-8000-000000000002",
+    "prompt_id": null,
+    "session_id": "00000000-0000-4000-8000-000000000002",
+    "source": null
+  },
+  "model": { "id": null, "name": "default", "resolved": "default", "session": null },
+  "repo": { "name": "example-repo" },
+  "pdlc": { "active": false },
+  "data": {
+    "generation": {
+      "id": "00000000-0000-4000-8000-0000000000b1",
+      "loop_count": 0,
+      "status": "completed"
+    },
+    "tokens": { "cache_read": 123264, "input": 141414, "output": 610, "total": 265288 }
+  },
+  "ext": {}
+}

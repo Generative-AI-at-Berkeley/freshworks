@@ -1,0 +1,21 @@
+{
+  "name": "@fwcoach/testkit",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Synthetic org trees and synthetic collector traffic for tests, local dev and the demo. Never real people.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "@fwcoach/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@fwcoach/contracts": "workspace:*"
+  }
+}

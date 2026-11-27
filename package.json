@@ -1,0 +1,55 @@
+{
+  "name": "fwcoach",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Fleet telemetry for AI coding assistants: local collector, ingest, rollups and query API.",
+  "type": "module",
+  "packageManager": "pnpm@10.12.3",
+  "engines": {
+    "node": "^22.12.0 || ^24.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --workspace-concurrency=1 run build",
+    "typecheck": "pnpm -r run typecheck",
+    "lint": "eslint . --max-warnings=0",
+    "lint:content": "python3 scripts/lint_content.py",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run --project unit",
+    "test:watch": "vitest --project unit",
+    "test:int": "vitest run --project integration",
+    "test:e2e": "vitest run --project e2e",
+    "db:up": "dbmate --wait up",
+    "db:down": "dbmate rollback",
+    "db:new": "dbmate new",
+    "db:status": "dbmate status",
+    "dev:infra": "docker compose up -d postgres",
+    "dev:ingest": "pnpm --filter @fwcoach/ingest-mock dev",
+    "dev:api": "pnpm --filter @fwcoach/api dev",
+    "check": "pnpm lint && pnpm lint:content && pnpm format:check && pnpm typecheck && pnpm test && pnpm build",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@types/node": "^22.20.2",
+    "@vitest/coverage-v8": "5.1.2",
+    "dbmate": "2.38.2",
+    "eslint": "10.15.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.14.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.2",
+    "prettier": "3.10.1",
+    "tsx": "4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "8.74.0",
+    "vitest": "5.1.2"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs}": [
+      "eslint --max-warnings=0 --no-warn-ignored",
+      "prettier --write"
+    ],
+    "*.{md,json,yml,yaml}": "prettier --write"
+  }
+}

@@ -1,0 +1,20 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+
+# Local collector state. Never commit a real buffer or credential.
+.fwcoach/
+*.credential
+*.token
+
+# Real directory exports and raw harness data stay on your machine.
+# Use packages/testkit to generate synthetic data instead.
+*.xlsx
+*.vscdb
+roster*.csv

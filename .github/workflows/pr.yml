@@ -1,0 +1,49 @@
+name: pr
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+  # Required checks must also report in a merge queue, or merges wait forever.
+  # The jobs skip there (they already passed on the PR), and a skipped
+  # required check counts as passing.
+  merge_group:
+
+permissions:
+  contents: read
+
+jobs:
+  title:
+    name: title has a ticket
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: check title
+        # The title is untrusted input. Read it from env, never interpolate it into the script.
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if printf '%s' "$TITLE" | grep -Eq '^((X|BE|AG)-[0-9]+|chore|docs|ci|deps)(\(.+\))?: .+'; then
+            echo "ok: $TITLE"
+          else
+            echo "::error::PR title must start with a ticket ID, like 'BE-2: dedupe on msg_id'."
+            echo "Work with no ticket uses chore:, docs:, ci: or deps:. See CONTRIBUTING.md."
+            exit 1
+          fi
+
+  dependencies:
+    name: dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/dependency-review-action@bbc44d14a204704ccc493733616cd1e93a0321ec # v5.0.1
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: on-failure
+          # The repo is MIT. Block licences that would put conditions on it.
+          deny-licenses: GPL-2.0-only, GPL-2.0-or-later, GPL-3.0-only, GPL-3.0-or-later, AGPL-3.0-only, AGPL-3.0-or-later

@@ -1,0 +1,10 @@
+# Owners are requested for review automatically. Approval from any reviewer
+# satisfies branch protection; owners are who to ask first.
+#
+# TODO: add per-area owners once everyone has write access. A handle without
+# write access makes GitHub ignore the line. Planned areas:
+#   /packages/collector/ /docs/formats/    Agent & Integration team
+#   /services/ /db/                         Backend & Data team
+#   /packages/contracts/                    one reviewer from each team
+
+*                         @andrewlau624

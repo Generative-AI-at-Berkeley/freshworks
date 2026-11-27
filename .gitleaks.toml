@@ -1,0 +1,20 @@
+# gitleaks config. Runs in CI on full history (ci.yml, secrets job) and on
+# staged changes in the pre-commit hook if gitleaks is installed locally.
+
+[extend]
+useDefault = true
+
+# This repo is public. Internal Freshworks hostnames are configuration and
+# must never be committed (ADR 0007). The public marketing site is fine; any
+# subdomain is assumed internal.
+[[rules]]
+id = "freshworks-internal-host"
+description = "Internal Freshworks hostname"
+regex = '''(?i)\b[a-z0-9-]+(\.[a-z0-9-]+)*\.(freshworks|freshworksapi|freshdesk|freshservice)\.(com|io|net|corp|internal)\b'''
+keywords = ["freshworks", "freshdesk", "freshservice"]
+
+[[rules]]
+id = "bearer-token-literal"
+description = "Hard-coded bearer token"
+regex = '''(?i)authorization['"]?\s*[:=]\s*['"]bearer\s+[a-z0-9._~+/=-]{20,}['"]'''
+keywords = ["bearer"]
