@@ -99,6 +99,7 @@ and every allowed individual view is written to `access_log`.
 | [0005](decisions/0005-credits-and-cost.md)                   | Credits stay credits; cost is sourced or null                            |
 | [0006](decisions/0006-retention.md)                          | 13 months of detail, summaries kept                                      |
 | [0007](decisions/0007-public-repo-hygiene.md)                | Public repo: internal anything arrives as config                         |
+| [0008](decisions/0008-repo-layout.md)                        | Where code goes per workspace, and the import boundaries CI checks       |
 
 ## Not in this repo yet
 
