@@ -15,6 +15,7 @@
     "lint:content": "python3 scripts/lint_content.py",
     "lint:deps": "depcruise apps services packages e2e --config .dependency-cruiser.mjs",
     "lint:rules": "python3 scripts/lint_rules.py",
+    "lint:migrations": "bash scripts/lint_migrations.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run --project unit --project dashboard",

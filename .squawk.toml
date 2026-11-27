@@ -1,0 +1,14 @@
+# Migration lint config. scripts/lint_migrations.sh runs squawk with it.
+
+pg_version = "18.0"
+
+# dbmate wraps each migration in a transaction unless it opts out.
+assume_in_transaction = true
+
+excluded_rules = [
+    # Every migration so far creates new objects in an empty app schema, where
+    # these two fire on every statement. Turn require-lock-timeout back on once
+    # migrations start altering tables that take live writes.
+    "require-lock-timeout",
+    "require-statement-timeout",
+]
