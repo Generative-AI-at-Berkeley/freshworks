@@ -344,7 +344,8 @@ jobs:
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [lint, test, db, build, e2e, dashboard-smoke, secrets, migration-lint, links, images, alerts]
+    needs:
+      [lint, test, db, build, e2e, dashboard-smoke, secrets, migration-lint, links, images, alerts]
     runs-on: ubuntu-latest
     steps:
       - name: every required job passed
