@@ -1,6 +1,8 @@
+export { skillAdoption } from '@/mock/skills';
 import type { api } from '@fwcoach/contracts';
 
 import type { DayRange } from '@/lib/range';
+import { lastDay } from '@/mock/days';
 import {
   chainAbove,
   directReports,
@@ -17,93 +19,6 @@ import {
  * so screenshots and tests are stable.
  */
 
-const SKILLS = [
-  {
-    skillId: 'code-review',
-    name: 'code-review',
-    harness: 'claude-code',
-    installed: 9,
-    active: 7,
-    invocations: 412,
-    days: 2,
-  },
-  {
-    skillId: 'incident-summary',
-    name: 'incident-summary',
-    harness: 'claude-code',
-    installed: 5,
-    active: 1,
-    invocations: 6,
-    days: 11,
-  },
-  {
-    skillId: 'migration-helper',
-    name: 'migration-helper',
-    harness: 'cursor',
-    installed: 6,
-    active: 4,
-    invocations: 88,
-    days: 4,
-  },
-  {
-    skillId: 'release-notes',
-    name: 'release-notes',
-    harness: 'kiro',
-    installed: 8,
-    active: 0,
-    invocations: 0,
-    days: null,
-  },
-  {
-    skillId: 'test-writer',
-    name: 'test-writer',
-    harness: 'claude-code',
-    installed: 4,
-    active: 3,
-    invocations: 151,
-    days: 1,
-  },
-] as const;
-
-function days(range: DayRange): string[] {
-  const out: string[] = [];
-  for (
-    let day = new Date(`${range.from}T00:00:00Z`);
-    day.toISOString().slice(0, 10) < range.to;
-    day.setUTCDate(day.getUTCDate() + 1)
-  ) {
-    out.push(day.toISOString().slice(0, 10));
-  }
-  return out;
-}
-
-export function skillAdoption(range: DayRange): api.SkillAdoption {
-  return {
-    range,
-    skills: SKILLS.map((skill) => ({
-      skillId: skill.skillId,
-      name: skill.name,
-      harness: skill.harness,
-      installedEngineers: skill.installed,
-      activeEngineers: skill.active,
-      invocations: skill.invocations,
-      medianDaysToFirstUse: skill.days,
-      // A slow climb to today's active count, so the trend has a shape.
-      trend: days(range).map((day, index, all) => ({
-        day,
-        activeEngineers: Math.round((skill.active * (index + 1)) / all.length),
-      })),
-      departments: (['org-platform', 'org-payments', 'org-mobile'] as const).map(
-        (orgUnitId, index) => ({
-          orgUnitId,
-          name: ORG_UNITS[orgUnitId],
-          activeEngineers: Math.max(0, Math.round(skill.active / 3) - (index === 2 ? 1 : 0)),
-        }),
-      ),
-    })),
-  };
-}
-
 export function orgOverview(orgUnitId: string, range: DayRange): api.OrgOverview | null {
   if (!isOrgUnitId(orgUnitId)) return null;
   const engineers =
@@ -115,6 +30,7 @@ export function orgOverview(orgUnitId: string, range: DayRange): api.OrgOverview
   return {
     orgUnit: { id: orgUnitId, name: ORG_UNITS[orgUnitId] },
     range,
+    dataThrough: lastDay(range),
     engineers,
     activeEngineers: Math.max(1, engineers - 1),
     harnesses: [
@@ -197,6 +113,7 @@ export function leaderRollup(
     chain: chainAbove(manager.id),
     depth,
     range,
+    dataThrough: lastDay(range),
     total,
     teams: reports.filter((report) => directReports(report.id).length > 0).map(team),
     directReports: reports.map((report, index) => ({

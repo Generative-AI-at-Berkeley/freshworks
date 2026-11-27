@@ -9,9 +9,9 @@
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  width: 14rem;
-  gap: var(--spacing-300);
-  padding: var(--spacing-200);
+  width: 15rem;
+  gap: var(--spacing-250);
+  padding: var(--spacing-200) var(--spacing-150);
   border-right: 1px solid var(--color-boundary-border-mildest);
   background: var(--color-fill-container);
 }
@@ -27,43 +27,95 @@
   justify-content: space-between;
   gap: var(--spacing-100);
   min-height: 2rem;
-  font-weight: var(--font-weight-semi-bold);
+  padding-left: var(--spacing-100);
 }
 
-.brand a {
+.product {
+  font-size: 15px;
+  font-weight: var(--font-weight-semi-bold);
+  letter-spacing: -0.01em;
   text-decoration: none;
+}
+
+.scope {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-075);
+  min-height: 3.25rem;
+  padding: var(--spacing-150);
+  border: 1px solid var(--color-boundary-border-mildest);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-fill-surface);
+}
+
+.scope p {
+  margin: 0;
+}
+
+.scope .viewer {
+  min-width: 0;
+}
+
+.org {
+  font-weight: var(--font-weight-semi-bold);
+  font-size: 13px;
+}
+
+.viewer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-075);
+  color: var(--color-text-secondary);
+  font-size: 12px;
 }
 
 .nav {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-050);
+  gap: var(--spacing-250);
   flex: 1;
   min-height: 0;
   overflow-y: auto;
 }
 
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-025);
+}
+
+.groupLabel {
+  margin: 0 0 var(--spacing-050);
+  padding-left: var(--spacing-100);
+  color: var(--color-text-placeholder);
+  font-size: 12px;
+}
+
 .link {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--spacing-150);
-  height: 2.25rem;
-  padding: 0 var(--spacing-150);
-  border-radius: var(--border-radius-medium);
+  height: 2rem;
+  padding: 0 var(--spacing-100);
+  border-radius: var(--border-radius-small);
   color: var(--color-text-secondary);
+  font-size: 13px;
   text-decoration: none;
   white-space: nowrap;
 }
 
 .link:hover {
   background: var(--color-overlay-neutral);
+  color: var(--color-text-primary);
 }
 
-/* fill-neutral-* is the dark brand navy in light mode. fill-base is the neutral selection tint. */
+/* A quiet tint plus a short brand rule: the one place brand color marks location. */
 .active {
-  background: var(--color-fill-base);
+  background: var(--color-fill-surface);
   color: var(--color-text-primary);
   font-weight: var(--font-weight-medium);
+  box-shadow: inset 2px 0 0 var(--color-boundary-brand);
 }
 
 .footer {
@@ -71,6 +123,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--spacing-150);
+  padding-left: var(--spacing-100);
   color: var(--color-text-secondary);
   font-size: 12px;
 }
@@ -101,21 +154,29 @@
     border-bottom: 1px solid var(--color-boundary-border-mildest);
   }
 
-  .brand button {
+  .brand {
+    padding-left: 0;
+  }
+
+  .brand button,
+  .scope,
+  .groupLabel,
+  .footer {
     display: none;
   }
 
   .nav {
     flex-direction: row;
+    gap: var(--spacing-050);
     overflow-x: auto;
     overflow-y: hidden;
   }
 
-  .link {
-    flex-shrink: 0;
+  .group {
+    flex-direction: row;
   }
 
-  .footer {
-    display: none;
+  .link {
+    flex-shrink: 0;
   }
 }

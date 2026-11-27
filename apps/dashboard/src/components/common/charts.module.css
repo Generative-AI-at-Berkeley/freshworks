@@ -1,21 +1,13 @@
 /*
- * Small single-series charts. One series means one hue (Dew brand), no legend:
- * the column header or section title names it. Track and grid stay recessive.
+ * One data ink for measured series, a dashed neutral for comparison, recessive
+ * grid. Values in tooltips wear text colors, never the series color.
  */
 .meter {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-150);
-  min-width: 0;
-}
-
-.track {
   display: block;
   flex: 1;
-  min-width: 3rem;
-  max-width: 9rem;
-  height: 6px;
-  border-radius: 3px;
+  min-width: 48px;
+  height: 4px;
+  border-radius: 2px;
   background: var(--color-fill-base);
   overflow: hidden;
 }
@@ -23,61 +15,246 @@
 .fill {
   display: block;
   height: 100%;
-  border-radius: 3px;
-  background: var(--color-fill-brand);
+  border-radius: 2px;
+  background: var(--fw-ink-data);
 }
 
-.meterLabel {
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+.fill[data-tone='muted'] {
+  background: var(--color-text-placeholder);
 }
 
 .spark {
   display: block;
-  color: var(--color-fill-brand);
+  overflow: visible;
+}
+
+.sparkBase {
+  stroke: var(--color-boundary-border-mildest);
+  stroke-width: 1;
+}
+
+.sparkLine {
+  fill: none;
+  stroke: var(--fw-ink-data);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.sparkDot {
+  fill: var(--fw-ink-data);
+}
+
+.trend {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--border-radius-small);
+  outline: none;
+}
+
+.trend:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-boundary-brand);
+}
+
+.trend svg {
+  display: block;
+  touch-action: pan-y;
+}
+
+.grid {
+  stroke: var(--color-boundary-border-mildest);
+  stroke-width: 1;
+}
+
+.tick {
+  fill: var(--color-text-placeholder);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.primaryLine {
+  fill: none;
+  stroke: var(--fw-ink-data);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.compareLine {
+  fill: none;
+  stroke: var(--color-text-placeholder);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.crosshair {
+  stroke: var(--color-boundary-border-mild);
+  stroke-width: 1;
+}
+
+.endDot {
+  fill: var(--fw-ink-data);
+  stroke: var(--color-fill-surface);
+  stroke-width: 2;
+}
+
+.compareDot {
+  fill: var(--color-text-placeholder);
+  stroke: var(--color-fill-surface);
+  stroke-width: 2;
+}
+
+.tooltip {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 150px;
+  padding: var(--spacing-100) var(--spacing-150);
+  border: 1px solid var(--color-boundary-border-mildest);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-fill-surface);
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
+  font-size: 12px;
+}
+
+.tooltip p {
+  margin: 0;
+}
+
+.tipDay {
+  margin-bottom: var(--spacing-050) !important;
+  color: var(--color-text-secondary);
+}
+
+.tipRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-075);
+}
+
+.tipLabel {
+  flex: 1;
+  color: var(--color-text-secondary);
+}
+
+.tipValue {
+  font-weight: var(--font-weight-semi-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 2px;
+  margin-right: var(--spacing-075);
+  vertical-align: middle;
+  background: var(--fw-ink-data);
+}
+
+.swatch[data-kind='compare'] {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-text-placeholder) 0 3px,
+    transparent 3px 5px
+  );
+}
+
+.tipRow .swatch {
+  margin-right: 0;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-200);
+  margin-top: var(--spacing-100);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.barList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-150);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) 3rem;
+  align-items: center;
+  gap: var(--spacing-200);
+  font-size: 13px;
+}
+
+.barLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.barValue {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.histogramFigure {
+  margin: 0;
+  max-width: 28rem;
 }
 
 .histogram {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
-  align-items: end;
+  display: flex;
+  align-items: flex-end;
   gap: 2px;
   height: 120px;
-  max-width: 24rem;
   border-bottom: 1px solid var(--color-boundary-border-mild);
 }
 
 .bin {
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
   height: 100%;
-  min-width: 0;
+  gap: var(--spacing-050);
+}
+
+.binCount {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 .bar {
   width: 100%;
   border-radius: 4px 4px 0 0;
-  background: var(--color-fill-brand);
-}
-
-.binCount {
-  font-size: 12px;
-  color: var(--color-text-secondary);
-  margin-bottom: var(--spacing-050);
-  font-variant-numeric: tabular-nums;
+  background: var(--fw-ink-data);
 }
 
 .axis {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr);
+  display: flex;
   gap: 2px;
-  max-width: 24rem;
   margin-top: var(--spacing-075);
-  color: var(--color-text-secondary);
-  font-size: 12px;
+}
+
+.axis span {
+  flex: 1;
+  color: var(--color-text-placeholder);
+  font-size: 11px;
   text-align: center;
 }

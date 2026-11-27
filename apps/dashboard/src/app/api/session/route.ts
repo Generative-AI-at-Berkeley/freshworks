@@ -22,6 +22,13 @@ export function GET(): Response {
   const session: Session =
     config.mode === ServerMode.Mock
       ? { mode: ServerMode.Mock, ...MOCK_VIEWER }
-      : { mode: ServerMode.Api, engineerId: config.devEngineer, orgUnitId: config.devOrgUnit };
+      : {
+          mode: ServerMode.Api,
+          engineerId: config.devEngineer,
+          orgUnitId: config.devOrgUnit,
+          // TODO(X-3): names come from /v1/me/data once BE-2 serves it.
+          displayName: null,
+          orgUnitName: null,
+        };
   return NextResponse.json(session, { headers: { 'cache-control': 'no-store' } });
 }

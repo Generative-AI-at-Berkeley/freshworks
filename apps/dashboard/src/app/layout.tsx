@@ -14,6 +14,11 @@ import { THEME_INIT_SCRIPT } from '@/lib/theme';
 
 import { Providers } from './providers';
 
+// Every view reads the period from the URL and the viewer from the session,
+// so nothing here is worth prerendering. Rendering per request also means the
+// server and the browser hydrate the same tree in one pass.
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: APP_NAME,
   description: 'How engineering teams use AI coding tools, and which skills are catching on.',

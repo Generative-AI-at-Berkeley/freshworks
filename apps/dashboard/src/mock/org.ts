@@ -33,7 +33,12 @@ export const PEOPLE: readonly MockPerson[] = [
 ];
 
 /** Who mock mode signs you in as: the VP, so every view has data. */
-export const MOCK_VIEWER = { engineerId: 'e-100', orgUnitId: 'org-eng' } as const;
+export const MOCK_VIEWER = {
+  engineerId: 'e-100',
+  orgUnitId: 'org-eng',
+  displayName: 'Avery Stone',
+  orgUnitName: 'Engineering',
+} as const;
 
 export function person(id: string): MockPerson | undefined {
   return PEOPLE.find((p) => p.id === id);

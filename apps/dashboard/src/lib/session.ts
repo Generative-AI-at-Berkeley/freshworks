@@ -11,5 +11,8 @@ export const Session = z.strictObject({
   mode: z.enum([ServerMode.Mock, ServerMode.Api]),
   engineerId: z.string(),
   orgUnitId: z.string(),
+  /** Display names when the dashboard knows them. Null shows the id instead. */
+  displayName: z.string().nullable(),
+  orgUnitName: z.string().nullable(),
 });
 export type Session = z.infer<typeof Session>;

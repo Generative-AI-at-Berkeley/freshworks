@@ -1,0 +1,263 @@
+/* Skill adoption. Colors are Dew tokens; --fw-ink-data is set in globals.css. */
+
+.overview {
+  display: grid;
+  grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
+  gap: var(--spacing-500);
+  padding: var(--spacing-300);
+  border: 1px solid var(--color-boundary-border-mildest);
+  border-radius: var(--border-radius-medium);
+}
+
+.headline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-075);
+  min-width: 0;
+}
+
+.headline p {
+  margin: 0;
+}
+
+.kpiLabel {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+}
+
+.kpi {
+  font-size: 44px;
+  line-height: 48px;
+  font-weight: var(--font-weight-semi-bold);
+  letter-spacing: -0.02em;
+}
+
+.kpiNote {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.funnel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-150);
+  margin: var(--spacing-250) 0 0;
+  padding: var(--spacing-250) 0 0;
+  border-top: 1px solid var(--color-boundary-border-mildest);
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  row-gap: var(--spacing-075);
+  font-size: 13px;
+}
+
+.step > :last-child {
+  grid-column: 1 / -1;
+}
+
+.stepLabel {
+  color: var(--color-text-secondary);
+  cursor: help;
+}
+
+.stepValue {
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.stepShare {
+  margin-left: var(--spacing-075);
+  color: var(--color-text-placeholder);
+  font-weight: normal;
+}
+
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-150);
+  min-width: 0;
+}
+
+.chartTitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+}
+
+.insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--spacing-400);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.columnTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-100);
+  margin: 0;
+  padding-bottom: var(--spacing-100);
+  border-bottom: 1px solid var(--color-boundary-border-mild);
+  font-size: 13px;
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.count {
+  color: var(--color-text-placeholder);
+  font-weight: normal;
+}
+
+.insightList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-050);
+  padding: var(--spacing-200) 0;
+  border-bottom: 1px solid var(--color-boundary-border-mildest);
+}
+
+.insight p {
+  margin: 0;
+}
+
+.insightHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-100);
+  flex-wrap: wrap;
+}
+
+.insightStatus {
+  margin-left: auto;
+}
+
+.reason {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.next {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.none,
+.footnote {
+  margin: var(--spacing-150) 0 0;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.skillLink {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semi-bold);
+  text-decoration: none;
+}
+
+.skillLink:hover {
+  color: var(--color-text-brand);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tool {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-150);
+  flex-wrap: wrap;
+}
+
+.search {
+  flex: 0 1 16rem;
+  min-width: 12rem;
+}
+
+.segments {
+  flex: none;
+  width: auto !important;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.nameCell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-025);
+}
+
+.adoption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-075);
+  width: 100%;
+}
+
+.daily {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-025);
+}
+
+.adoptionTop {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-100);
+  white-space: nowrap;
+}
+
+.rate {
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.secondary {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+}
+
+.change {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+}
+
+.change[data-tone='up'] {
+  color: var(--color-text-semantic-success);
+}
+
+.change[data-tone='down'] {
+  color: var(--color-text-semantic-error);
+}
+
+@media (max-width: 900px) {
+  .overview {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-300);
+  }
+}
+
+@media (max-width: 640px) {
+  .overview {
+    padding: var(--spacing-200);
+  }
+}

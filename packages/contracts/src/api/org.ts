@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { HarnessSchema } from '../harness.js';
-import { Cost, Coverage, Distribution, Measured, Range } from './common.js';
+import { Cost, Coverage, Day, Distribution, Measured, Range } from './common.js';
 
 /**
  * `GET /v1/org/{orgUnitId}/overview`. Draft from X-3 (dashboard). BE-3 owns
@@ -22,6 +22,8 @@ export type HarnessUsage = z.infer<typeof HarnessUsage>;
 export const OrgOverview = z.strictObject({
   orgUnit: z.strictObject({ id: z.string(), name: z.string() }),
   range: Range,
+  /** Last day with a finished rollup. */
+  dataThrough: Day.nullable(),
   engineers: z.number().int().nonnegative(),
   activeEngineers: z.number().int().nonnegative(),
   harnesses: z.array(HarnessUsage),

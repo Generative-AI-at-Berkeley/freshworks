@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Histogram, Meter } from '@/components/common/charts';
 import { Section } from '@/components/common/section';
+import { TableFrame } from '@/components/common/table-frame';
 import { QueryView } from '@/components/common/states';
 import { Figure, Summary } from '@/components/common/summary';
 import { Secondary, Value } from '@/components/common/value';
@@ -41,7 +42,7 @@ function UsageCell({ row }: { row: api.HarnessUsage }) {
  * TODO(X-3): usage trend, cost explain (`?explain=true`) behind the cost figure.
  */
 export function OrgView({ orgUnitId }: { orgUnitId: string }) {
-  const range = useRange();
+  const { range } = useRange();
   const query = useQuery({
     queryKey: queryKeys.orgOverview(orgUnitId, range),
     queryFn: () => apiClient.orgOverview(orgUnitId, range),
@@ -49,9 +50,9 @@ export function OrgView({ orgUnitId }: { orgUnitId: string }) {
 
   return (
     <Page
+      dataThrough={query.data?.dataThrough}
       title={query.data?.orgUnit.name ?? 'Org overview'}
       description="How this department uses AI coding tools, what it costs, and how evenly use is spread across people."
-      range={range}
     >
       <QueryView query={query}>
         {(data) => (
@@ -83,54 +84,56 @@ export function OrgView({ orgUnitId }: { orgUnitId: string }) {
               title="By tool"
               hint="Each tool reports what it can. Gaps are marked, never counted as zero."
             >
-              <Table
-                skipPagination
-                data={data.harnesses.map((row) => ({ ...row, id: row.harness }))}
-                columns={[
-                  {
-                    id: 'tool',
-                    header: 'Tool',
-                    cell: ({ row }) => <strong>{harnessLabel(row.original.harness)}</strong>,
-                  },
-                  {
-                    id: 'engineers',
-                    header: 'Engineers',
-                    size: 200,
-                    cell: ({ row }) => (
-                      <Meter
-                        share={
-                          data.engineers === 0
-                            ? null
-                            : row.original.activeEngineers / data.engineers
-                        }
-                        label={formatCount(row.original.activeEngineers)}
-                      />
-                    ),
-                  },
-                  {
-                    id: 'sessions',
-                    header: 'Sessions',
-                    cell: ({ row }) => formatCount(row.original.sessions),
-                  },
-                  {
-                    id: 'usage',
-                    header: 'Usage',
-                    size: 240,
-                    cell: ({ row }) => <UsageCell row={row.original} />,
-                  },
-                  {
-                    id: 'cost',
-                    header: 'Estimated cost',
-                    cell: ({ row }) => (
-                      <Value
-                        value={row.original.cost.costUsd}
-                        format={formatUsd}
-                        missing="priced"
-                      />
-                    ),
-                  },
-                ]}
-              />
+              <TableFrame>
+                <Table
+                  skipPagination
+                  data={data.harnesses.map((row) => ({ ...row, id: row.harness }))}
+                  columns={[
+                    {
+                      id: 'tool',
+                      header: 'Tool',
+                      cell: ({ row }) => <strong>{harnessLabel(row.original.harness)}</strong>,
+                    },
+                    {
+                      id: 'engineers',
+                      header: 'Engineers',
+                      size: 200,
+                      cell: ({ row }) => (
+                        <Meter
+                          share={
+                            data.engineers === 0
+                              ? null
+                              : row.original.activeEngineers / data.engineers
+                          }
+                          label={formatCount(row.original.activeEngineers)}
+                        />
+                      ),
+                    },
+                    {
+                      id: 'sessions',
+                      header: 'Sessions',
+                      cell: ({ row }) => formatCount(row.original.sessions),
+                    },
+                    {
+                      id: 'usage',
+                      header: 'Usage',
+                      size: 240,
+                      cell: ({ row }) => <UsageCell row={row.original} />,
+                    },
+                    {
+                      id: 'cost',
+                      header: 'Estimated cost',
+                      cell: ({ row }) => (
+                        <Value
+                          value={row.original.cost.costUsd}
+                          format={formatUsd}
+                          missing="priced"
+                        />
+                      ),
+                    },
+                  ]}
+                />
+              </TableFrame>
             </Section>
 
             <Section

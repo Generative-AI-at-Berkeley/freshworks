@@ -24,7 +24,7 @@ import styles from './views.module.css';
  * page writes access_log on the API side (BE-2).
  */
 export function EngineerView({ engineerId }: { engineerId: string }) {
-  const range = useRange();
+  const { range } = useRange();
   const query = useQuery({
     queryKey: queryKeys.engineer(engineerId, range),
     queryFn: () => apiClient.engineer(engineerId, range),
@@ -41,7 +41,6 @@ export function EngineerView({ engineerId }: { engineerId: string }) {
           : undefined
       }
       crumbs={data?.chain.map((person) => ({ label: person.name, href: ROUTES.leader(person.id) }))}
-      range={range}
     >
       <QueryView query={query}>
         {(detail) => {

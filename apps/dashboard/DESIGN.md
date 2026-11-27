@@ -5,15 +5,21 @@ design system: its components, colours, type and spacing are not redefined here.
 
 ## Every page
 
-- Header: breadcrumb (the management chain, where there is one), title, the
-  date range on the right, then one sentence saying what question the page
-  answers. A number without its period cannot be trusted.
+- Header: breadcrumb where there is one, title, one sentence on the question
+  the page answers, and the period control (7, 28 or 90 days) on the right.
+  Under it a context row: scope, period, the comparison period when the page
+  compares, and the last day with finished data. The period lives in the URL
+  (`?days=`) and every link carries it.
 - Then a summary strip (`Summary` + `Figure`): one panel split into cells, at
   most four. Never a row of separate cards.
 - Then sections (`Section`), each with a title and, when it is not obvious, a
   one-line hint on how to read it.
-- What needs a decision comes first (skill adoption's "Needs a decision"),
-  the full table after.
+- Skill adoption reads top to bottom as: are engineers using skills at all
+  (headline rate, installed to used to still using, daily trend), where to act
+  (statuses from `lib/skill-status.ts`, each with its reason and next step),
+  then every skill in a sortable, filterable table. Rows open `/skills/[id]`.
+- Comparisons come from asking the API for the previous period. If that call
+  fails the comparison is left out, never estimated.
 
 ## Numbers
 
@@ -30,11 +36,21 @@ design system: its components, colours, type and spacing are not redefined here.
 - Rows that open something show `PersonName` and end with `RowChevron`.
 - Per-person pages lead with what could help them, not with volume.
 
+## Color
+
+- One data ink, `--fw-ink-data` (Dew chart category 09), for every measured
+  series and bar. Comparison series are a dashed neutral.
+- Brand blue only means "you can click this" or "you are here".
+- Semantic colors only for status dots and up or down deltas, always next to
+  a word. Never a tinted warning box.
+
 ## Charts
 
-- Single series only, in Dew brand fill, no legend (the header names it).
+- `TrendChart` for a daily series: y axis, dates, crosshair tooltip, arrow
+  keys. Busy daily series show a 7-day average and say so in the title.
 - `Sparkline` for a trend in a table cell, `Histogram` for a spread, `Meter`
-  for a share. Anything bigger waits for the chart library decision on X-3.
+  for a share next to its number, `BarList` for a few labelled counts.
+- Tables go in `TableFrame`: no header fill, no vertical rules.
 
 ## Layout
 

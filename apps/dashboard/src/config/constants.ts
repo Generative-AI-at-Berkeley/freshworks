@@ -9,6 +9,7 @@ export const ROUTES = {
   practice: '/practice',
   engineer: (engineerId: string) => `/engineers/${encodeURIComponent(engineerId)}`,
   leader: (managerId: string) => `/leaders/${encodeURIComponent(managerId)}`,
+  skill: (skillId: string) => `/skills/${encodeURIComponent(skillId)}`,
 } as const;
 
 /** Browser-local preferences. Per-device UI state, never server state. */
@@ -23,5 +24,5 @@ export const STORAGE_KEYS = {
  */
 export const PROXY_PREFIX = '/api';
 
-/** Default window for every view until a range picker exists. */
-export const DEFAULT_RANGE_DAYS = 28;
+/** Default period for every view. The header's period control changes it per URL. */
+export const DEFAULT_RANGE_DAYS = 28 as const;

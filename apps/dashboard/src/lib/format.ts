@@ -60,3 +60,23 @@ export function formatRange(range: { from: string; to: string }): string {
   last.setUTCDate(last.getUTCDate() - 1);
   return `${shortDate.format(from)} to ${fullDate.format(last)}`;
 }
+
+/** "+12 pts" or "-5 pts" for a change in a share. Null when either side is unknown. */
+export function formatPointsDelta(current: number | null, previous: number | null): string | null {
+  if (current === null || previous === null) return null;
+  const points = Math.round((current - previous) * 100);
+  if (points === 0) return 'No change';
+  return `${points > 0 ? '+' : '−'}${Math.abs(points)} pts`;
+}
+
+/** "+3" or "-2" for a change in a count. */
+export function formatCountDelta(current: number, previous: number): string {
+  const delta = current - previous;
+  if (delta === 0) return 'No change';
+  return `${delta > 0 ? '+' : '−'}${integer.format(Math.abs(delta))}`;
+}
+
+/** "Nov 26" for one day. */
+export function formatDay(day: string): string {
+  return shortDate.format(new Date(`${day}T00:00:00Z`));
+}

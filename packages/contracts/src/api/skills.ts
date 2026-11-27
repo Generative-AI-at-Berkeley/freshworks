@@ -30,8 +30,32 @@ export const SkillAdoptionRow = z.strictObject({
 });
 export type SkillAdoptionRow = z.infer<typeof SkillAdoptionRow>;
 
+/**
+ * Distinct engineers across all skills. Per-skill counts cannot be summed
+ * (one engineer uses several skills), so the API counts these itself.
+ * Installation, activation and ongoing use are separate on purpose.
+ */
+export const AdoptionTotals = z.strictObject({
+  /** Engineers the caller may see (their subtree, or everyone for an admin). */
+  engineersInScope: z.number().int().nonnegative(),
+  /** Have at least one shared skill installed at the end of the range. */
+  engineersWithSkills: z.number().int().nonnegative(),
+  /** Used at least one shared skill in the range. */
+  engineersUsingSkills: z.number().int().nonnegative(),
+  /** Used at least one shared skill in the last 7 days of the range. */
+  engineersUsingLast7Days: z.number().int().nonnegative(),
+  /** Distinct engineers using any shared skill, per day. */
+  trend: z.array(
+    z.strictObject({ day: Day, engineersUsingSkills: z.number().int().nonnegative() }),
+  ),
+});
+export type AdoptionTotals = z.infer<typeof AdoptionTotals>;
+
 export const SkillAdoption = z.strictObject({
   range: Range,
+  /** Last day with a finished rollup. Days after it in the range are not counted yet. */
+  dataThrough: Day.nullable(),
+  totals: AdoptionTotals,
   /** Sorted by skill name. Never by usage. */
   skills: z.array(SkillAdoptionRow),
 });

@@ -1,41 +1,73 @@
 .header {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-075);
-  padding: var(--spacing-250) var(--spacing-400) var(--spacing-200);
-  border-bottom: 1px solid var(--color-boundary-border-mildest);
+  gap: var(--spacing-150);
+  padding: var(--spacing-300) var(--spacing-500) var(--spacing-250);
   flex-shrink: 0;
 }
 
 .titleRow {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: var(--spacing-200);
+  gap: var(--spacing-300);
   flex-wrap: wrap;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-050);
+  min-width: 0;
+  flex: 1 1 20rem;
 }
 
 .title {
   margin: 0;
-  font-size: 20px;
-  line-height: 28px;
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.01em;
   font-weight: var(--font-weight-semi-bold);
-  min-width: 0;
   overflow-wrap: anywhere;
 }
 
-.range {
-  color: var(--color-text-secondary);
-  font-size: 13px;
-  white-space: nowrap;
+.period {
+  flex: none;
+  width: auto !important;
 }
 
 .description {
   margin: 0;
-  max-width: 44rem;
+  max-width: 40rem;
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 20px;
+}
+
+.context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-100) var(--spacing-400);
+  margin: 0;
+  padding-top: var(--spacing-150);
+  border-top: 1px solid var(--color-boundary-border-mildest);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.context > div {
+  display: flex;
+  gap: var(--spacing-075);
+}
+
+.context dt {
+  color: var(--color-text-placeholder);
+}
+
+.context dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
 }
 
 .body {
@@ -43,10 +75,10 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--spacing-300) var(--spacing-400) var(--spacing-600);
+  padding: var(--spacing-100) var(--spacing-500) var(--spacing-800);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-400);
+  gap: var(--spacing-600);
 }
 
 /* The body scrolls; its children must keep their height instead of shrinking to fit. */
@@ -55,9 +87,7 @@
 }
 
 @media (max-width: 640px) {
-  .header {
-    padding-inline: var(--spacing-200);
-  }
+  .header,
   .body {
     padding-inline: var(--spacing-200);
   }

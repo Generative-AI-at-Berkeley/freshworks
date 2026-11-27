@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Meter } from '@/components/common/charts';
 import { PersonName, RowChevron } from '@/components/common/person';
 import { Section } from '@/components/common/section';
+import { TableFrame } from '@/components/common/table-frame';
 import { EmptyState, QueryView } from '@/components/common/states';
 import { Figure, Summary } from '@/components/common/summary';
 import { Secondary, Value } from '@/components/common/value';
@@ -26,7 +27,7 @@ import { queryKeys } from '@/lib/query-keys';
  * TODO(X-3): depth control once BE-3 settles what depth returns.
  */
 export function LeaderView({ managerId }: { managerId: string }) {
-  const range = useRange();
+  const { range } = useRange();
   const router = useRouter();
   const depth = 2;
   const query = useQuery({
@@ -37,10 +38,10 @@ export function LeaderView({ managerId }: { managerId: string }) {
 
   return (
     <Page
-      title={data?.manager.name ?? 'Leaders'}
+      dataThrough={query.data?.dataThrough}
+      title={data?.manager.name ?? 'Teams'}
       description="Everyone in this part of the org. Open a team to go a level down, or a person to see which skills could help them."
       crumbs={data?.chain.map((person) => ({ label: person.name, href: ROUTES.leader(person.id) }))}
-      range={range}
     >
       <QueryView query={query}>
         {(rollup) => {
@@ -79,53 +80,59 @@ export function LeaderView({ managerId }: { managerId: string }) {
                     description="This person has no direct reports on these dates."
                   />
                 ) : (
-                  <Table
-                    skipPagination
-                    data={rows}
-                    onRowClick={(row) => {
-                      router.push(
-                        row.team ? ROUTES.leader(row.engineerId) : ROUTES.engineer(row.engineerId),
-                      );
-                    }}
-                    columns={[
-                      {
-                        id: 'name',
-                        header: 'Name',
-                        size: 240,
-                        cell: ({ row }) => <PersonName name={row.original.name} />,
-                      },
-                      {
-                        id: 'team',
-                        header: 'Team using AI tools',
-                        size: 220,
-                        cell: ({ row }) => {
-                          const team = row.original.team;
-                          if (!team) return <Secondary>No team</Secondary>;
-                          return (
-                            <Meter
-                              share={
-                                team.engineers === 0 ? null : team.activeEngineers / team.engineers
-                              }
-                              label={`${formatCount(team.activeEngineers)} of ${formatCount(team.engineers)}`}
-                            />
-                          );
+                  <TableFrame clickable>
+                    <Table
+                      skipPagination
+                      data={rows}
+                      onRowClick={(row) => {
+                        router.push(
+                          row.team
+                            ? ROUTES.leader(row.engineerId)
+                            : ROUTES.engineer(row.engineerId),
+                        );
+                      }}
+                      columns={[
+                        {
+                          id: 'name',
+                          header: 'Name',
+                          size: 240,
+                          cell: ({ row }) => <PersonName name={row.original.name} />,
                         },
-                      },
-                      {
-                        id: 'tools',
-                        header: 'Their tools',
-                        cell: ({ row }) =>
-                          row.original.harnesses.map(harnessLabel).join(', ') || 'None yet',
-                      },
-                      {
-                        id: 'unused',
-                        header: 'Skills never used',
-                        cell: ({ row }) =>
-                          `${formatCount(row.original.skillsNeverUsed)} of ${formatCount(row.original.skillsInstalled)}`,
-                      },
-                      { id: 'go', header: '', size: 48, cell: () => <RowChevron /> },
-                    ]}
-                  />
+                        {
+                          id: 'team',
+                          header: 'Team using AI tools',
+                          size: 220,
+                          cell: ({ row }) => {
+                            const team = row.original.team;
+                            if (!team) return <Secondary>No team</Secondary>;
+                            return (
+                              <Meter
+                                share={
+                                  team.engineers === 0
+                                    ? null
+                                    : team.activeEngineers / team.engineers
+                                }
+                                label={`${formatCount(team.activeEngineers)} of ${formatCount(team.engineers)}`}
+                              />
+                            );
+                          },
+                        },
+                        {
+                          id: 'tools',
+                          header: 'Their tools',
+                          cell: ({ row }) =>
+                            row.original.harnesses.map(harnessLabel).join(', ') || 'None yet',
+                        },
+                        {
+                          id: 'unused',
+                          header: 'Skills never used',
+                          cell: ({ row }) =>
+                            `${formatCount(row.original.skillsNeverUsed)} of ${formatCount(row.original.skillsInstalled)}`,
+                        },
+                        { id: 'go', header: '', size: 48, cell: () => <RowChevron /> },
+                      ]}
+                    />
+                  </TableFrame>
                 )}
               </Section>
             </>

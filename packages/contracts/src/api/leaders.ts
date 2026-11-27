@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { Cost, Coverage, PersonRef, Range } from './common.js';
+import { Cost, Coverage, Day, PersonRef, Range } from './common.js';
 
 /**
  * `GET /v1/leaders/{managerId}/rollup?depth=`. Draft from X-3 (dashboard).
@@ -37,6 +37,8 @@ export const LeaderRollup = z.strictObject({
   chain: z.array(PersonRef),
   depth: z.number().int().min(1),
   range: Range,
+  /** Last day with a finished rollup. */
+  dataThrough: Day.nullable(),
   total: TeamRollup.omit({ managerId: true, managerName: true }),
   teams: z.array(TeamRollup),
   directReports: z.array(ReportSummary),
