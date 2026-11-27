@@ -105,6 +105,28 @@ jobs:
       - name: apply again from empty
         run: pnpm exec dbmate up
       - run: pnpm test:int
+      - name: back up, restore into a new database, compare
+        # Proves docs/runbooks/backup-restore.md. The runner's pg_dump is
+        # older than the server and refuses to dump it, so the scripts run in
+        # the server's image. The probe table checks that rows, grants and
+        # the append_only trigger all survive the round trip.
+        env:
+          SOURCE_DATABASE_URL: ${{ env.DATABASE_URL }}
+          RESTORE_URL: postgres://fwcoach:fwcoach@localhost:5432/fwcoach_restore?sslmode=disable
+        run: |
+          pg() { docker run --rm --network host -v "$PWD:/w" -w /w -e DATABASE_URL -e SOURCE_DATABASE_URL postgres:18-alpine "$@"; }
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -c 'create table app.restore_probe (id int primary key)' \
+            -c "select app.append_only('app.restore_probe')" \
+            -c 'insert into app.restore_probe select generate_series(1, 100)'
+          pg sh scripts/db/backup.sh ci.dump
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -c 'create database fwcoach_restore'
+          DATABASE_URL="$RESTORE_URL" pg sh scripts/db/restore.sh ci.dump
+          DATABASE_URL="$RESTORE_URL" pg sh scripts/db/compare.sh
+          if psql "$RESTORE_URL" -c 'delete from app.restore_probe'; then
+            echo "The restored probe table accepted a delete. The append_only trigger did not survive." >&2
+            exit 1
+          fi
 
   build:
     name: build

@@ -19,6 +19,10 @@ coverage/
 *.vscdb
 roster*.csv
 
+# Database backups (scripts/db/backup.sh). They hold every row.
+*.dump
+*.dump.partial
+
 # Playwright output (e2e/dashboard).
 test-results/
 playwright-report/

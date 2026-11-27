@@ -52,8 +52,10 @@ auditable. A live run should match the dry run before it.
 - **A live run fails halfway.** Run it again. Dropping a partition is one
   statement, so each one is either gone or intact, and the job must be safe to
   re-run (`jobs/cli.ts`).
-- **Data was dropped that should not have been.** Restore from a backup.
-  Rollups are not rebuilt from raw events once those are gone.
+- **Data was dropped that should not have been.** Restore from a backup into
+  a scratch database and copy the lost rows back
+  ([backup-restore.md](backup-restore.md)). Rollups are not rebuilt from raw
+  events once those are gone.
 
 ## Departed employees
 

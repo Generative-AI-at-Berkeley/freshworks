@@ -105,3 +105,30 @@ writing its own policy.
 
 Rollup rows that carry cost also carry `cost_coverage` and `cost_price_ids`,
 the `price_book` rows used, so any total can be explained (`?explain=true`).
+
+## Append-only tables
+
+The baseline gives `fwcoach_app` select, insert, update and delete on every
+new table. Audit tables must not allow the last two. A migration opts a table
+out with `select app.append_only('app.access_log')`. It revokes update, delete
+and truncate from `fwcoach_app`, and adds triggers that raise on any update,
+delete or truncate, so even the owner or a superuser gets an error instead of
+quietly rewriting history. Dropping a partition still works, which is how
+retention removes old data.
+
+TODO(BE-2): call `app.append_only()` on `access_log` in the migration that
+creates it. BE-1 should do the same for `ingest_rejection` and
+`retention_run`. If a purge of one of these is ever decided, its migration
+drops the `append_only` trigger first, which makes the change visible in
+review.
+
+## Timeouts for services
+
+Login users in `fwcoach_app` get `statement_timeout` 30s, `lock_timeout` 5s
+and `idle_in_transaction_session_timeout` 60s at the role level
+(`db/migrations/20261127000100_app_role_timeouts.sql`, which explains the
+values). This is the backstop. The API pool sets its own in
+`services/api/src/db.ts`. Postgres reads role settings from the login user,
+not from its groups, so a login user added to `fwcoach_app` after that
+migration needs the same three `alter role ... set` lines. A job that needs a
+longer query runs `set local statement_timeout` inside its transaction.

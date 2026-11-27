@@ -11,5 +11,6 @@
 | collector-rollout.md: packaging for Jamf, upgrades, rollback                    | TODO(AG-1)                           |
 | [failure-modes.md](failure-modes.md): what breaks, how it shows up, what to do  | started, everyone adds as they learn |
 | access-log-review.md: how admins review who viewed whom                         | TODO(BE-2)                           |
+| [backup-restore.md](backup-restore.md): back up, restore, compare               | ready, schedule and PITR proposed    |
 
 Spec 9.2 makes these part of the final handover.
