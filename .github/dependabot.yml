@@ -16,6 +16,9 @@ updates:
       # typescript-eslint does not support TypeScript 7 yet. Lift this when it does.
       - dependency-name: typescript
         update-types: [version-update:semver-major]
+      # Types follow the oldest Node we support (engines in package.json), not the newest.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   - package-ecosystem: github-actions
     directory: /
@@ -38,3 +41,8 @@ updates:
       day: monday
     commit-message:
       prefix: deps
+    ignore:
+      # A Postgres major is a planned upgrade (dump and restore, CI image,
+      # docs), not a weekly bump.
+      - dependency-name: postgres
+        update-types: [version-update:semver-major]
