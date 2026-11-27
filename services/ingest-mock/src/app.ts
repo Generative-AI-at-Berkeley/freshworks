@@ -1,14 +1,27 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 
-import { decodeBatch, OTLP_LOGS_PATH, OtlpLogsRequest } from '@fwcoach/contracts';
+import {
+  decodeBatch,
+  isRequestId,
+  LOG_REDACT_CENSOR,
+  LOG_REDACT_PATHS,
+  OTLP_LOGS_PATH,
+  OtlpLogsRequest,
+  REQUEST_ID_HEADER,
+} from '@fwcoach/contracts';
 import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
 
+import { createMetrics, observeRequests, RecordOutcome, type IngestMetrics } from './metrics.js';
 import type { EventStore } from './store/types.js';
 
 export interface AppOptions {
   store: EventStore;
   /** Fastify logger setting. Tests pass false. */
   logger?: boolean;
+  /** Where log lines go. Defaults to stdout. Tests pass a capture stream. */
+  logStream?: { write(line: string): void };
+  /** Defaults to a fresh registry, which main.ts then serves on the metrics port. */
+  metrics?: IngestMetrics;
   /** Largest request body accepted, in bytes. TODO(BE-1): match the real pipeline once Freshworks shares it. */
   bodyLimit?: number;
 }
@@ -21,9 +34,26 @@ export interface AppOptions {
 export function buildApp({
   store,
   logger = true,
+  logStream,
+  metrics = createMetrics(),
   bodyLimit = 5 * 1024 * 1024,
 }: AppOptions): FastifyInstance {
-  const app = Fastify({ logger, bodyLimit });
+  const app = Fastify({
+    logger: logger && {
+      redact: { paths: [...LOG_REDACT_PATHS], censor: LOG_REDACT_CENSOR },
+      ...(logStream && { stream: logStream }),
+    },
+    bodyLimit,
+    genReqId: (request) => {
+      const inbound = request.headers[REQUEST_ID_HEADER];
+      return isRequestId(inbound) ? inbound : randomUUID();
+    },
+  });
+  app.addHook('onRequest', (request, reply, done) => {
+    void reply.header(REQUEST_ID_HEADER, request.id);
+    done();
+  });
+  observeRequests(app, metrics);
 
   app.get('/healthz', () => ({ status: 'ok' }));
 
@@ -43,6 +73,9 @@ export function buildApp({
 
     const result = await store.store(deviceId, accepted);
     request.log.info({ deviceId, ...result, rejected: rejected.length }, 'batch stored');
+    metrics.records.inc({ outcome: RecordOutcome.Accepted }, result.inserted);
+    metrics.records.inc({ outcome: RecordOutcome.Duplicate }, result.duplicates);
+    metrics.records.inc({ outcome: RecordOutcome.Rejected }, rejected.length);
 
     return rejected.length === 0
       ? {}
@@ -81,5 +114,8 @@ function authenticate(header: string | undefined): string | null {
 }
 
 function problem(reply: FastifyReply, status: number, detail: string) {
-  return reply.status(status).type('application/problem+json').send({ status, detail });
+  return reply
+    .status(status)
+    .type('application/problem+json')
+    .send({ status, detail, requestId: reply.request.id });
 }

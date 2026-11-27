@@ -3,6 +3,7 @@ export * from './event.js';
 export * from './event-type.js';
 export * from './harness.js';
 export * from './ids.js';
+export * from './observability.js';
 export * from './otlp.js';
 export * from './proposed.js';
 export { AgentInvokedData } from './events/agent-invoked.js';

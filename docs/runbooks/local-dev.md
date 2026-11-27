@@ -26,6 +26,8 @@ Try them:
 curl localhost:4318/healthz
 curl localhost:8080/readyz
 curl -H 'X-Dev-Engineer: E1' localhost:8080/v1/me/data
+curl localhost:9464/metrics    # API metrics, own port, localhost only
+curl localhost:9465/metrics    # ingest-mock metrics
 ```
 
 The last one answers 501 until BE-2 serves the route. A 501 names the ticket
@@ -53,6 +55,13 @@ The dashboard container is behind a profile, so it only starts when asked:
 
 ```sh
 docker compose --profile dashboard up -d --build --wait
+```
+
+Prometheus and Grafana are behind the `observability` profile
+([observability.md](../observability.md#see-it-locally)):
+
+```sh
+docker compose --profile observability up -d --build --wait
 ```
 
 For a walkthrough on synthetic data, use `pnpm demo` instead ([demo.md](demo.md)).

@@ -43,5 +43,10 @@ export const PersonRef = z.strictObject({ id: z.string(), name: z.string() });
 export const Range = z.strictObject({ from: Day, to: Day });
 
 /** The error body for every non-2xx response, `application/problem+json`. */
-export const Problem = z.looseObject({ status: z.number().int(), detail: z.string() });
+export const Problem = z.looseObject({
+  status: z.number().int(),
+  detail: z.string(),
+  /** Same value as the X-Request-ID response header and the server's log line. */
+  requestId: z.string().optional(),
+});
 export type Problem = z.infer<typeof Problem>;

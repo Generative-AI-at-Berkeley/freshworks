@@ -1,6 +1,8 @@
 # Local dev and the demo (pnpm demo). Everything here is synthetic and local.
 #   docker compose up -d --wait          whole stack
 #   docker compose up -d postgres        just the database (pnpm dev:infra)
+#   docker compose --profile observability up -d --wait
+#                                        adds Prometheus and Grafana (docs/observability.md)
 
 name: fwcoach
 
@@ -41,6 +43,8 @@ services:
         SERVICE: ingest-mock
     environment:
       INGEST_PORT: '4318'
+      # Reachable on the compose network for Prometheus. Not published to the host.
+      INGEST_METRICS_HOST: 0.0.0.0
       APP_DATABASE_URL: postgres://fwcoach_api:fwcoach_api@postgres:5432/fwcoach?sslmode=disable
     ports:
       - '127.0.0.1:${INGEST_PORT:-4318}:4318'
@@ -71,6 +75,8 @@ services:
       NODE_ENV: staging
       API_AUTH_MODE: local
       API_ALLOW_HEADER_AUTH: 'true'
+      # Reachable on the compose network for Prometheus. Not published to the host.
+      API_METRICS_HOST: 0.0.0.0
       APP_DATABASE_URL: postgres://fwcoach_api:fwcoach_api@postgres:5432/fwcoach?sslmode=disable
     ports:
       - '127.0.0.1:${API_PORT:-8080}:8080'
@@ -117,6 +123,64 @@ services:
           '-e',
           "fetch('http://localhost:3000/api/session').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
         ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Off by default, like the dashboard. /metrics is never published to the
+  # host: Prometheus scrapes it over the compose network.
+  prometheus:
+    profiles: [observability]
+    image: prom/prometheus:v3.5.0
+    volumes:
+      - ./ops/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./ops/alerts.yml:/etc/prometheus/alerts.yml:ro
+    ports:
+      - '127.0.0.1:${PROMETHEUS_PORT:-9090}:9090'
+    depends_on:
+      api:
+        condition: service_healthy
+      ingest-mock:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:9090/-/ready']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Serves the job metrics files that jobs/run-job.ts writes when JOB_METRICS_DIR is set.
+  node-exporter:
+    profiles: [observability]
+    image: prom/node-exporter:v1.9.1
+    command:
+      - --collector.disable-defaults
+      - --collector.textfile
+      - --collector.textfile.directory=/textfile
+    volumes:
+      - ${JOB_METRICS_HOST_DIR:-./.job-metrics}:/textfile:ro
+
+  grafana:
+    profiles: [observability]
+    image: grafana/grafana:12.1.0
+    environment:
+      # Local only, bound to 127.0.0.1, synthetic data. No login to get in the way.
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_AUTH_DISABLE_LOGIN_FORM: 'true'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+      GF_ANALYTICS_CHECK_FOR_UPDATES: 'false'
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: 'false'
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/fwcoach.json
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - '127.0.0.1:${GRAFANA_PORT:-3001}:3000'
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:3000/api/health']
       interval: 5s
       timeout: 3s
       retries: 20

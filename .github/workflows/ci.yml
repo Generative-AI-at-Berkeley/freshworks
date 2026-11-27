@@ -325,12 +325,26 @@ jobs:
           format: table
           exit-code: '1'
 
+  alerts:
+    name: alert rules (promtool)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Same image as the observability compose profile, so CI checks what runs.
+      - name: check rules and scrape config
+        run: |
+          docker run --rm -v "$PWD/ops:/ops:ro" --entrypoint promtool prom/prometheus:v3.5.0 check rules /ops/alerts.yml
+          docker run --rm -v "$PWD/ops:/ops:ro" --entrypoint promtool prom/prometheus:v3.5.0 check config --syntax-only /ops/prometheus.yml
+      - name: alert unit tests
+        run: docker run --rm -v "$PWD/ops:/ops:ro" -w /ops --entrypoint promtool prom/prometheus:v3.5.0 test rules alerts.test.yml
+
   # The one check branch protection requires. Add new jobs to `needs` and the
   # ruleset never has to change.
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [lint, test, db, build, e2e, dashboard-smoke, secrets, migration-lint, links, images]
+    needs: [lint, test, db, build, e2e, dashboard-smoke, secrets, migration-lint, links, images, alerts]
     runs-on: ubuntu-latest
     steps:
       - name: every required job passed

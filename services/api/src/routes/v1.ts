@@ -53,6 +53,10 @@ export function v1(config: Pick<ApiConfig, 'authMode'>) {
   };
 }
 
-function problem(reply: FastifyReply, status: number, detail: string) {
-  return reply.status(status).type('application/problem+json').send({ status, detail });
+/** `requestId` matches the X-Request-ID header and the log line, so a reported error can be found. */
+export function problem(reply: FastifyReply, status: number, detail: string) {
+  return reply
+    .status(status)
+    .type('application/problem+json')
+    .send({ status, detail, requestId: reply.request.id });
 }

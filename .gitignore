@@ -29,3 +29,6 @@ playwright-report/
 
 # pnpm test:load output.
 load-results/
+
+# Job metrics written for the observability compose profile (JOB_METRICS_DIR).
+.job-metrics/

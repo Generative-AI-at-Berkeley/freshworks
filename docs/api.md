@@ -39,7 +39,10 @@ Data reads go through `withCaller` in `src/db.ts`.
 
 ## Conventions
 
-- Errors are `application/problem+json`: `{ "status": 403, "detail": "..." }`.
+- Errors are `application/problem+json`:
+  `{ "status": 403, "detail": "...", "requestId": "..." }`. `requestId`
+  matches the `X-Request-ID` response header and the API's log line
+  ([observability.md](observability.md#request-ids)).
   `detail` says what broke and what to do.
 - Dates are UTC days as `YYYY-MM-DD`. Ranges are `from` inclusive, `to` exclusive.
 - Every cost comes with its coverage: `{ "costUsd": 1234.5, "costCoverage": 0.82 }`.

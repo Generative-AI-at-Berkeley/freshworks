@@ -13,6 +13,7 @@
   "dependencies": {
     "@fwcoach/contracts": "workspace:*",
     "fastify": "5.12.8",
+    "prom-client": "15.1.3",
     "zod": "4.6.7"
   },
   "files": [
