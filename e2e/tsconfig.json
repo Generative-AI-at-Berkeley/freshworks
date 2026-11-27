@@ -1,5 +1,6 @@
 {
   "extends": "../tsconfig.base.json",
-  "compilerOptions": { "noEmit": true },
+  // DOM for the code Playwright runs inside the page (page.evaluate).
+  "compilerOptions": { "noEmit": true, "lib": ["ES2023", "DOM"] },
   "include": ["**/*.ts"]
 }

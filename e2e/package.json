@@ -5,10 +5,16 @@
   "description": "End-to-end suite: collector traffic through mock ingest into Postgres, rollups, then API access checks.",
   "type": "module",
   "scripts": {
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:dashboard": "playwright test"
   },
   "dependencies": {
     "@fwcoach/contracts": "workspace:*",
-    "@fwcoach/testkit": "workspace:*"
+    "@fwcoach/testkit": "workspace:*",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/pg": "8.23.1"
   }
 }

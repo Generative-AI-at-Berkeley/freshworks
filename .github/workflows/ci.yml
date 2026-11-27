@@ -141,6 +141,40 @@ jobs:
       - if: always()
         run: docker compose down -v
 
+  dashboard-smoke:
+    name: dashboard smoke (playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - id: playwright
+        run: echo "version=$(pnpm --filter @fwcoach/e2e exec playwright --version | awk '{print $2}')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        id: browsers
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - if: steps.browsers.outputs.cache-hit != 'true'
+        run: pnpm --filter @fwcoach/e2e exec playwright install --with-deps chromium
+      # The browser is cached, the system libraries it needs are not.
+      - if: steps.browsers.outputs.cache-hit == 'true'
+        run: pnpm --filter @fwcoach/e2e exec playwright install-deps chromium
+      - run: pnpm --filter "@fwcoach/dashboard..." build
+      - run: pnpm test:dashboard
+      - name: playwright traces
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: playwright-traces
+          path: e2e/test-results/
+          retention-days: 7
+
   secrets:
     name: secret scan
     runs-on: ubuntu-latest
@@ -194,7 +228,7 @@ jobs:
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [lint, test, db, build, e2e, secrets, migration-lint, links]
+    needs: [lint, test, db, build, e2e, dashboard-smoke, secrets, migration-lint, links]
     runs-on: ubuntu-latest
     steps:
       - name: every required job passed
