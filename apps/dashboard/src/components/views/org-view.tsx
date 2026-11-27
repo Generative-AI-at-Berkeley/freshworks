@@ -17,6 +17,8 @@ import { apiClient } from '@/lib/api-client';
 import { formatCompact, formatCount, formatCoverage, formatPercent, formatUsd } from '@/lib/format';
 import { queryKeys } from '@/lib/query-keys';
 
+import styles from './views.module.css';
+
 /**
  * Usage in the unit a tool actually reports. Kiro bills in credits and those
  * are never turned into tokens (ADR 0005), so one column holds either.
@@ -49,17 +51,13 @@ export function OrgView({ orgUnitId }: { orgUnitId: string }) {
   });
 
   return (
-    <Page
-      dataThrough={query.data?.dataThrough}
-      title={query.data?.orgUnit.name ?? 'Org overview'}
-      description="How this department uses AI coding tools, what it costs, and how evenly use is spread across people."
-    >
+    <Page dataThrough={query.data?.dataThrough} title={query.data?.orgUnit.name ?? 'Org overview'}>
       <QueryView query={query}>
         {(data) => (
           <>
             <Summary>
               <Figure
-                label="Using AI tools"
+                label="Active engineers"
                 value={formatCount(data.activeEngineers)}
                 of={`of ${formatCount(data.engineers)} engineers`}
               />
@@ -69,20 +67,21 @@ export function OrgView({ orgUnitId }: { orgUnitId: string }) {
                 note={formatCoverage(data.cost.costCoverage, 'usage priced')}
               />
               <Figure
-                label="Typical sessions per engineer"
+                label="Sessions per engineer"
+                definition="Median sessions per engineer over the period."
                 value={<Value value={data.sessionsPerEngineer.p50} format={formatCount} />}
-                note="Median over the range"
+                note="Median"
               />
               <Figure
-                label="Work done by subagents"
+                label="Subagent share"
+                definition="Share of tokens done by subagents, counted inside the parent session."
                 value={<Value value={data.subagentShare} format={formatPercent} />}
-                note="Share of tokens, counted inside the parent session"
               />
             </Summary>
 
             <Section
               title="By tool"
-              hint="Each tool reports what it can. Gaps are marked, never counted as zero."
+              info="Each tool reports what it can. Gaps show as not measured, never as zero."
             >
               <TableFrame>
                 <Table
@@ -98,16 +97,26 @@ export function OrgView({ orgUnitId }: { orgUnitId: string }) {
                       id: 'engineers',
                       header: 'Engineers',
                       size: 200,
-                      cell: ({ row }) => (
-                        <Meter
-                          share={
-                            data.engineers === 0
-                              ? null
-                              : row.original.activeEngineers / data.engineers
-                          }
-                          label={formatCount(row.original.activeEngineers)}
-                        />
-                      ),
+                      cell: ({ row }) => {
+                        const share =
+                          data.engineers === 0
+                            ? null
+                            : row.original.activeEngineers / data.engineers;
+                        return (
+                          <span className={styles.shareCell}>
+                            <span className={styles.shareTop}>
+                              <span className={styles.shareValue}>
+                                {formatCount(row.original.activeEngineers)}
+                              </span>
+                              <Secondary>{`of ${formatCount(data.engineers)}`}</Secondary>
+                            </span>
+                            <Meter
+                              share={share}
+                              label={`${formatCount(row.original.activeEngineers)} of ${formatCount(data.engineers)} engineers`}
+                            />
+                          </span>
+                        );
+                      },
                     },
                     {
                       id: 'sessions',
@@ -138,7 +147,7 @@ export function OrgView({ orgUnitId }: { orgUnitId: string }) {
 
             <Section
               title="Sessions per engineer"
-              hint="How many engineers fall in each band. A spread, not a ranking: nobody is named here."
+              info="Engineers in each band. A spread, not a ranking, so nobody is named."
             >
               <Histogram
                 label="Engineers by number of sessions"

@@ -3,15 +3,16 @@ import type { IconName } from '@freshworks/dew-components';
 import { ROUTES } from '@/config/constants';
 
 /**
- * The sidebar, grouped by the question a manager is asking: are shared skills
- * catching on, how do my teams and tools compare, and is the practice healthy.
- * The first item is the landing route.
+ * The icon rail, grouped by the question a manager is asking: are shared
+ * skills catching on, how do my teams and tools compare, and is the practice
+ * healthy. The first item is the landing route.
  */
 export interface NavItem {
   label: string;
   href: string;
-  /** Shown only when the sidebar is collapsed, where text does not fit. */
   icon: IconName;
+  /** Dew's filled variant, shown on the active rail item as Freshworks products do. */
+  activeIcon: IconName;
   /** A predicate, not a prefix, so a detail route lights up one entry. */
   isActive: (pathname: string) => boolean;
 }
@@ -30,7 +31,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       {
         label: 'Skill adoption',
         href: ROUTES.skills,
-        icon: 'FavouriteStar',
+        icon: 'LeftNavBar/Analytics',
+        activeIcon: 'LeftNavBar/AnalyticsSelected',
         isActive: startsWith(ROUTES.skills),
       },
     ],
@@ -41,7 +43,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       {
         label: 'Teams',
         href: ROUTES.leaders,
-        icon: 'GroupSharedUsers',
+        icon: 'LeftNavBar/Organization',
+        activeIcon: 'LeftNavBar/OrganizationSelected',
         // An engineer page is reached from the team drill-down.
         isActive: (pathname) =>
           pathname.startsWith(ROUTES.leaders) || pathname.startsWith('/engineers'),
@@ -49,7 +52,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       {
         label: 'Tools and cost',
         href: ROUTES.org,
-        icon: 'Chart2',
+        icon: 'LeftNavBar/Dashboard',
+        activeIcon: 'LeftNavBar/DashboardSelected',
         isActive: startsWith(ROUTES.org),
       },
     ],
@@ -60,7 +64,8 @@ export const NAV_GROUPS: readonly NavGroup[] = [
       {
         label: 'Practice health',
         href: ROUTES.practice,
-        icon: 'ShowActivities',
+        icon: 'LeftNavBar/Workload',
+        activeIcon: 'LeftNavBar/WorkloadSelected',
         isActive: startsWith(ROUTES.practice),
       },
     ],

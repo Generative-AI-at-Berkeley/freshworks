@@ -1,181 +1,194 @@
-/* The shell is one viewport tall and never scrolls. Page bodies own the scroll. */
+/*
+ * Freshworks' Dew frame: grey container, top bar, icon rail on the left, and
+ * the page on a white panel with a rounded top-left corner.
+ */
 .shell {
-  display: flex;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'top top'
+    'rail panel';
   height: 100dvh;
-  overflow: hidden;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  width: 15rem;
-  gap: var(--spacing-250);
-  padding: var(--spacing-200) var(--spacing-150);
-  border-right: 1px solid var(--color-boundary-border-mildest);
   background: var(--color-fill-container);
 }
 
-.collapsed {
-  width: 3.5rem;
-  align-items: center;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-100);
-  min-height: 2rem;
-  padding-left: var(--spacing-100);
-}
-
-.product {
-  font-size: 15px;
-  font-weight: var(--font-weight-semi-bold);
-  letter-spacing: -0.01em;
-  text-decoration: none;
-}
-
-.scope {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-075);
-}
-
-.scopePlaceholder {
-  min-height: 4.25rem;
-}
-
-.scope p {
-  margin: 0;
-}
-
-.scope .viewer {
+.top {
+  grid-area: top;
   min-width: 0;
 }
 
-.org {
-  font-weight: var(--font-weight-semi-bold);
-  font-size: 13px;
-}
-
-.viewer {
-  display: flex;
+.product {
+  display: inline-flex;
   align-items: center;
-  gap: var(--spacing-075);
-  color: var(--color-text-secondary);
-  font-size: 12px;
+  color: var(--color-text-primary);
+  border-radius: var(--border-radius-small);
 }
 
-.nav {
+.product:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 4px;
+}
+
+.avatarSlot {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.avatarButton {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+}
+
+.avatarButton:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+}
+
+.profile {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-250);
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+  gap: var(--spacing-200);
+  min-width: 240px;
+  padding: var(--spacing-200);
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-150);
+}
+
+.name,
+.org {
+  margin: 0;
+}
+
+.name {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.org {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.profileRow {
+  padding-top: var(--spacing-150);
+  border-top: 1px solid var(--fw-line);
+}
+
+.rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-200);
+  padding: var(--spacing-100) 0;
 }
 
 .group {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-025);
-}
-
-.groupLabel {
-  margin: 0 0 var(--spacing-050);
-  padding-left: var(--spacing-100);
-  color: var(--color-text-placeholder);
-  font-size: 12px;
+  gap: var(--spacing-100);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .link {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-150);
-  height: 2rem;
-  padding: 0 var(--spacing-100);
-  border-radius: var(--border-radius-medium);
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-large);
   color: var(--color-text-secondary);
-  font-size: 14px;
-  text-decoration: none;
-  white-space: nowrap;
+  transition: background-color 120ms ease;
 }
 
 .link:hover {
   background: var(--color-overlay-neutral);
-  color: var(--color-text-primary);
 }
 
-/* fill-neutral-* is the dark brand navy in light mode. fill-base is Dew's neutral selection tint. */
-.active {
-  background: var(--color-fill-base);
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
+.link[aria-current='page'] {
+  background: var(--color-fill-semantic-info-mildest);
+  border-color: var(--color-boundary-semantic-info-mild);
+  color: var(--color-text-brand);
 }
 
-.footer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--spacing-150);
-  padding-left: var(--spacing-100);
-  color: var(--color-text-secondary);
-  font-size: 12px;
+:global(.dew-dark-theme) .link[aria-current='page'] {
+  background: var(--color-fill-brand);
+  border-color: transparent;
+  color: var(--color-text-on-brand);
 }
 
-.main {
-  flex: 1;
+.iconActive {
+  display: none;
+}
+
+.link[aria-current='page'] .iconActive {
+  display: inline-flex;
+}
+
+.link[aria-current='page'] .iconRest {
+  display: none;
+}
+
+/* The filled icons carry their own brand fill, which disappears on a brand tile. */
+:global(.dew-dark-theme) .link[aria-current='page'] .iconActive {
+  display: none;
+}
+
+:global(.dew-dark-theme) .link[aria-current='page'] .iconRest {
+  display: inline-flex;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+}
+
+.panel {
+  grid-area: panel;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
   background: var(--color-fill-surface);
+  border-top-left-radius: 12px;
+  border-top: 1px solid var(--fw-line);
+  border-left: 1px solid var(--fw-line);
 }
 
-/* Phones: the sidebar becomes a top bar and the nav scrolls sideways. */
-@media (max-width: 768px) {
+/* Phones: the rail turns into a row under the top bar and the panel goes full width. */
+@media (max-width: 640px) {
   .shell {
-    flex-direction: column;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'top'
+      'rail'
+      'panel';
   }
 
-  .sidebar,
-  .collapsed {
-    width: auto;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--spacing-150);
-    padding: var(--spacing-100) var(--spacing-200);
-    border-right: none;
-    border-bottom: 1px solid var(--color-boundary-border-mildest);
-  }
-
-  .brand {
-    padding-left: 0;
-  }
-
-  .brand button,
-  .scope,
-  .scopePlaceholder,
-  .groupLabel,
-  .footer {
-    display: none;
-  }
-
-  .nav {
-    flex-direction: row;
-    gap: var(--spacing-050);
-    overflow-x: auto;
-    overflow-y: hidden;
-  }
-
+  .rail,
   .group {
     flex-direction: row;
+    justify-content: center;
   }
 
-  .link {
-    flex-shrink: 0;
+  .rail {
+    padding: 0 0 var(--spacing-100);
+  }
+
+  .panel {
+    border-radius: 0;
+    border-left: 0;
   }
 }

@@ -1,110 +1,119 @@
 'use client';
 
-import { Avatar, Card, Icon, IconButton } from '@freshworks/dew-components';
+import { Avatar, Icon, Popover, TopNavigation, Tooltip } from '@freshworks/dew-components';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, useSyncExternalStore } from 'react';
 
+import { FreshworksLogo } from '@/components/layout/freshworks-logo';
 import { SessionNote } from '@/components/layout/session-note';
 import { ThemeToggle } from '@/components/layout/theme-toggle';
-import { APP_NAME, STORAGE_KEYS } from '@/config/constants';
 import { LANDING_ROUTE, NAV_GROUPS } from '@/config/nav';
 import { useWithRange } from '@/hooks/use-range';
 import { useSession } from '@/hooks/use-session';
-import { readLocalStorage, subscribeLocalStorage, writeLocalStorage } from '@/lib/local-store';
 
 import styles from './app-shell.module.css';
 
-function NavLinks({
-  collapsed,
-  withRange,
-}: {
-  collapsed: boolean;
-  withRange: (href: string) => string;
-}) {
+/**
+ * Icon rail as in Freshworks' Dew products: icons only, the label in a
+ * tooltip, the filled icon on the active page. Groups are split by a gap.
+ */
+const noop = () => () => undefined;
+
+function Rail() {
   const pathname = usePathname();
+  // Dew's Tooltip reads `document` while rendering, so it joins after hydration.
+  const mounted = useSyncExternalStore(
+    noop,
+    () => true,
+    () => false,
+  );
+  // Switching sections keeps the chosen period.
+  const withRange = useWithRange();
   return (
-    <nav className={styles.nav} aria-label="Main">
+    <nav className={styles.rail} aria-label="Main">
       {NAV_GROUPS.map((group) => (
-        <div key={group.label} className={styles.group}>
-          {!collapsed && <p className={styles.groupLabel}>{group.label}</p>}
+        <ul key={group.label} className={styles.group} aria-label={group.label}>
           {group.items.map((item) => {
             const active = item.isActive(pathname);
-            return (
+            const link = (
               <NextLink
-                key={item.href}
                 href={withRange(item.href)}
-                title={collapsed ? item.label : undefined}
-                aria-label={collapsed ? item.label : undefined}
+                aria-label={item.label}
                 aria-current={active ? 'page' : undefined}
-                className={active ? `${styles.link} ${styles.active}` : styles.link}
+                className={styles.link}
               >
-                {collapsed ? <Icon name={item.icon} size="sm" /> : item.label}
+                <span className={styles.iconRest}>
+                  <Icon name={item.icon} size="md" color="currentColor" />
+                </span>
+                <span className={styles.iconActive}>
+                  <Icon name={item.activeIcon} size="md" color="currentColor" />
+                </span>
               </NextLink>
             );
+            return (
+              <li key={item.href}>
+                {mounted ? (
+                  <Tooltip content={item.label} placement="right">
+                    {link}
+                  </Tooltip>
+                ) : (
+                  link
+                )}
+              </li>
+            );
           })}
-        </div>
+        </ul>
       ))}
     </nav>
   );
 }
 
-/** Which organization this is and who is looking. Names come from the session, never from the page. */
-function Scope() {
+/** Who is looking and at which org, plus the theme. Names come from the session, never the page. */
+function Profile() {
   const session = useSession();
   const data = session.data;
-  if (!data) return <div className={styles.scopePlaceholder} aria-hidden="true" />;
+  if (!data) return <span className={styles.avatarSlot} aria-hidden="true" />;
   const viewer = data.displayName ?? data.engineerId;
+  const org = data.orgUnitName ?? data.orgUnitId;
   return (
-    <Card variant="outlined" padding="sm" className={styles.scope}>
-      <p className={styles.org}>{data.orgUnitName ?? data.orgUnitId}</p>
-      <div className={styles.viewer}>
-        <Avatar name={viewer} size="xs" />
-        <span>{viewer}</span>
-      </div>
-    </Card>
+    <Popover placement="bottom-end" mode="click">
+      <Popover.Trigger asChild>
+        <button type="button" className={styles.avatarButton} aria-label={`Profile, ${viewer}`}>
+          <Avatar name={viewer} size="sm" colorVariant="info" />
+        </button>
+      </Popover.Trigger>
+      <Popover.Content className={styles.profile}>
+        <div className={styles.who}>
+          <Avatar name={viewer} size="md" colorVariant="info" />
+          <div>
+            <p className={styles.name}>{viewer}</p>
+            <p className={styles.org}>{org}</p>
+          </div>
+        </div>
+        <div className={styles.profileRow}>
+          <ThemeToggle />
+        </div>
+      </Popover.Content>
+    </Popover>
   );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  // The server has no localStorage, so it renders expanded and the client
-  // reconciles without an effect that sets state after mount.
-  const collapsed = useSyncExternalStore(
-    (onChange) => subscribeLocalStorage(STORAGE_KEYS.sidebarCollapsed, onChange),
-    () => readLocalStorage(STORAGE_KEYS.sidebarCollapsed) === 'true',
-    () => false,
-  );
-  // Switching sections keeps the chosen period.
-  const withRange = useWithRange();
-  const toggle = () => {
-    writeLocalStorage(STORAGE_KEYS.sidebarCollapsed, String(!collapsed));
-  };
-
   return (
     <div className={styles.shell}>
-      <aside className={collapsed ? `${styles.sidebar} ${styles.collapsed}` : styles.sidebar}>
-        <div className={styles.brand}>
-          {!collapsed && (
-            <NextLink href={LANDING_ROUTE} className={styles.product}>
-              {APP_NAME}
+      <div className={styles.top}>
+        <TopNavigation aria-label="Product">
+          <TopNavigation.Left>
+            <NextLink href={LANDING_ROUTE} className={styles.product} aria-label="Home">
+              <FreshworksLogo height={26} />
             </NextLink>
-          )}
-          <IconButton
-            iconName={collapsed ? 'ExpandSidebar' : 'CollapseSidebar'}
-            aria-label={collapsed ? 'Expand navigation' : 'Collapse navigation'}
-            onClick={toggle}
-          />
-        </div>
-        {!collapsed && <Scope />}
-        <NavLinks collapsed={collapsed} withRange={withRange} />
-        {!collapsed && (
-          <div className={styles.footer}>
-            <SessionNote />
-            <ThemeToggle />
-          </div>
-        )}
-      </aside>
-      <main className={styles.main}>{children}</main>
+          </TopNavigation.Left>
+          <TopNavigation.Right buttons={<SessionNote />} avatar={<Profile />} />
+        </TopNavigation>
+      </div>
+      <Rail />
+      <main className={styles.panel}>{children}</main>
     </div>
   );
 }

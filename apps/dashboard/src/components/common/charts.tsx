@@ -1,6 +1,5 @@
 'use client';
 
-import { ProgressLoader } from '@freshworks/dew-components';
 import { type KeyboardEvent, type PointerEvent, useId, useState } from 'react';
 
 import { useWidth } from '@/hooks/use-width';
@@ -13,20 +12,25 @@ import styles from './charts.module.css';
  * chart category color; the comparison series is a dashed neutral.
  */
 
-/** A share as Dew's progress bar. The number beside it is the reading; the bar is the glance. */
+/**
+ * A share as a short graphite rule. It is a glance aid next to the number, so
+ * it stays neutral; color is kept for meaning.
+ */
 export function Meter({
   share,
   label,
+  tone = 'data',
 }: {
-  /** Null draws an empty bar. */
+  /** Null draws an empty track. */
   share: number | null;
   label: string;
-  tone?: 'data' | 'muted';
+  /** `accent` for the one headline breakdown on a page. */
+  tone?: 'data' | 'muted' | 'accent';
 }) {
   const clamped = Math.min(1, Math.max(0, share ?? 0));
   return (
-    <span className={styles.meter}>
-      <ProgressLoader value={Math.round(clamped * 100)} max={100} aria-label={label} />
+    <span className={styles.meter} role="img" aria-label={label}>
+      <span className={styles.fill} data-tone={tone} style={{ width: `${clamped * 100}%` }} />
     </span>
   );
 }
@@ -114,9 +118,9 @@ export function TrendChart({
   if (!primary || days.length < 2) return null;
 
   const max = niceMax(Math.max(1, ...series.flatMap((s) => s.values)));
-  const left = 32;
-  const right = 8;
-  const top = 8;
+  const left = 28;
+  const right = 12;
+  const top = 20;
   const bottom = 24;
   const plotW = Math.max(10, width - left - right);
   const plotH = height - top - bottom;
@@ -203,9 +207,23 @@ export function TrendChart({
           .map((s) => (
             <path key={s.label} className={styles.compareLine} d={path(s.values)} />
           ))}
+        <path
+          className={styles.area}
+          d={`${path(primary.values)}L${x(Math.min(primary.values.length, days.length) - 1).toFixed(1)},${y(0).toFixed(1)}L${x(0).toFixed(1)},${y(0).toFixed(1)}Z`}
+        />
         <path className={styles.primaryLine} d={path(primary.values)} />
         {active === null ? (
-          <circle className={styles.endDot} cx={x(days.length - 1)} cy={y(latest)} r={3.5} />
+          <>
+            <circle className={styles.endDot} cx={x(days.length - 1)} cy={y(latest)} r={4} />
+            <text
+              className={styles.endLabel}
+              x={x(days.length - 1) - 8}
+              y={y(latest) - 10}
+              textAnchor="end"
+            >
+              {format(latest)}
+            </text>
+          </>
         ) : (
           <>
             <line

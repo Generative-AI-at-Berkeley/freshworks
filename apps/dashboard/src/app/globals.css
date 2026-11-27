@@ -1,8 +1,26 @@
 /*
- * App-level styles only. Colors, type, spacing and radii come from Dew's CSS
- * variables (@freshworks/dew-styles), so dark mode follows the theme class on
- * <html>. Never hardcode a color here.
+ * Dew's own colors, unmodified, in both themes. The --fw-* names are only
+ * aliases so component CSS reads clearly; every one points at a Dew variable.
+ * Layout follows Freshworks' Dew products: grey frame, icon rail, white
+ * content panel, bordered cards.
  */
+:root {
+  --fw-frame: var(--color-fill-container);
+  --fw-panel: var(--color-fill-surface);
+  --fw-ink: var(--color-text-primary);
+  --fw-ink-2: var(--color-text-secondary);
+  --fw-ink-3: var(--color-text-placeholder);
+  --fw-rule: var(--fw-line);
+  --fw-rule-strong: var(--fw-line);
+  --fw-hover: var(--color-overlay-neutral);
+  --fw-accent: var(--color-fill-brand);
+  --fw-link: var(--color-text-brand);
+  --fw-data: var(--color-chart-category-01);
+  --fw-positive: var(--color-text-semantic-success);
+  --fw-negative: var(--color-text-semantic-error);
+  --fw-radius: var(--border-radius-medium);
+}
+
 html,
 body {
   height: 100%;
@@ -10,22 +28,31 @@ body {
 }
 
 body {
-  background: var(--color-fill-container);
-  color: var(--color-text-primary);
+  background: var(--fw-frame);
+  color: var(--fw-ink);
   font-family: var(--base-font-family);
   font-size: 14px;
+  line-height: 20px;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
 }
 
 a {
   color: inherit;
 }
 
-/* App tokens, built only from Dew variables. Charts use Dew's first chart category color. */
+/*
+ * Dew's dark boundaries are blue-grey against neutral grey surfaces, which
+ * reads as a tint. Card and divider lines use a neutral step instead.
+ */
 :root {
-  --fw-ink-data: var(--color-chart-category-01);
+  --fw-line: var(--color-boundary-border-milder);
 }
 
-/* Numbers line up in columns everywhere. */
-body {
-  font-variant-numeric: tabular-nums;
+.dew-dark-theme {
+  --fw-line: var(--color-fill-base);
+}
+
+.fw-card {
+  border-color: var(--fw-line) !important;
 }

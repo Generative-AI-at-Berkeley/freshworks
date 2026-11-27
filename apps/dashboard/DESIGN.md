@@ -1,62 +1,70 @@
 # Dashboard design
 
-Rules every view follows. Read this before adding or changing one. Dew is the
-design system: its components, colours, type and spacing are not redefined here.
+Rules every view follows. Read this before adding or changing one. The look
+follows Freshworks' own Dew products (Freshdesk and Freshservice analytics):
+Dew components with Dew's default colours, nothing restyled beyond layout.
+
+## Frame
+
+- Grey `fill-container` frame. Dew `TopNavigation` across the top with the
+  Freshworks logo on the left and the sample-data tag and profile avatar on
+  the right. The profile popover holds the viewer, the org and the theme switch.
+- An icon rail on the left: icon only, label in a tooltip, Dew's `Selected`
+  icon on the active page. Under 640px the rail becomes a row under the top bar.
+- The page sits on a white `fill-surface` panel with a rounded top-left corner.
 
 ## Every page
 
-- Header: breadcrumb where there is one, title, one sentence on the question
-  the page answers, and the period control (7, 28 or 90 days) on the right.
-  Under it a context row: scope, period, the comparison period when the page
-  compares, and the last day with finished data. The period lives in the URL
-  (`?days=`) and every link carries it.
-- Then a summary strip (`Summary` + `Figure`): one panel split into cells, at
-  most four. Never a row of separate cards.
-- Then sections (`Section`), each with a title and, when it is not obvious, a
-  one-line hint on how to read it.
-- Skill adoption reads top to bottom as: are engineers using skills at all
-  (headline rate, installed to used to still using, daily trend), where to act
-  (statuses from `lib/skill-status.ts`, each with its reason and next step),
-  then every skill in a sortable, filterable table. Rows open `/skills/[id]`.
+- Header row: breadcrumb (parents in brand blue) or the title, then the period
+  dates and the 7, 28 or 90 day control on the right. No description line. A
+  data-through note shows only when the data stops short of the period.
+- Then a row of KPI cards (`Summary` + `Figure`), one Dew card per number:
+  label, value, delta (a coloured triangle and the change, with what it is
+  compared against in a tooltip), and at most one short note.
+- Then widget cards (`Section`): bold title, an info icon for how the numbers
+  are counted, controls on the right of the title. Explanations go in the info
+  tooltip, never as body text.
+- Widget cards in a row share a fixed `height`. Lists inside them page with
+  `usePaged` / `Paged` (Dew `PageNavigation` in the card footer), so a card
+  never grows or shrinks with its content.
+- Copy is short, sentence case. Labels name the number ("Active engineers"),
+  they do not explain it.
 - Comparisons come from asking the API for the previous period. If that call
   fails the comparison is left out, never estimated.
 
 ## Numbers
 
-- Unknown renders through `Value`: muted "Not measured", "Not priced" or "Not
-  used yet", with the reason on hover. Never 0, never a dash.
+- Unknown renders through `Value`: "Not measured", "Not priced" or "Not used
+  yet". Never 0, never a dash.
 - A partial total carries its coverage as a note ("71% of usage priced").
-- Shares render as a `Meter` with the count beside it ("7 of 9"), so the bar
-  and the number say the same thing.
+- Shares render as a `Meter` with the count beside it ("7 of 9").
 - Usage is shown in the unit the tool reports: tokens, or credits for Kiro.
 
 ## People
 
-- Sorted by name. No column ranks people by usage (spec section 8).
-- Rows that open something show `PersonName` and end with `RowChevron`.
-- Per-person pages lead with what could help them, not with volume.
+- Sorted by name. No column ranks people by usage (spec section 8). Per-person
+  pages show no volume counters.
+- Rows that open something show `PersonName` and end with `RowChevron`, and
+  carry the period in the link.
 
-## Color
+## Colour
 
-- One data ink, `--fw-ink-data` (Dew chart category 01), for every measured
-  series and bar. Comparison series are a dashed neutral.
-- Brand blue only means "you can click this" or "you are here".
-- Semantic colors only for status dots and up or down deltas, always next to
-  a word, as Dew Tags. Never a tinted warning box.
-- Panels are Dew `Card` (outlined), statuses and changes are Dew `Tag`, shares
-  are Dew `ProgressLoader`, definitions are Dew `Tooltip`. Do not restyle Dew
-  components; only lay them out.
+- Dew variables only. `globals.css` defines `--fw-*` names as plain aliases of
+  Dew variables, plus `--fw-line`: Dew's border step in light, a neutral grey
+  in dark, because Dew's dark boundaries are blue-grey on neutral surfaces.
+  Cards take the `fw-card` class to use it.
+- Data is Dew chart category 01. Comparison series are a dashed neutral.
+- Brand blue means "you can click this" or "you are here".
+- Statuses are Dew `Tag`s. Up and down deltas use the semantic text colours.
+- The Freshworks logo keeps its own brand colours; its wordmark takes the text
+  colour so it reads in both themes.
 
-## Charts
+## Charts and tables
 
-- `TrendChart` for a daily series: y axis, dates, crosshair tooltip, arrow
-  keys. Busy daily series show a 7-day average and say so in the title.
-- `Sparkline` for a trend in a table cell, `Histogram` for a spread, `Meter`
-  for a share next to its number, `BarList` for a few labelled counts.
-- Tables go in `TableFrame`, which keeps Dew's table look and only adds scroll.
-
-## Layout
-
-- Desktop: sidebar plus a scrolling body. Under 768px the sidebar becomes a top
-  bar and wide tables scroll inside their frame. The page never scrolls sideways.
-- Colours only from Dew variables. Both themes are checked before merging.
+- `TrendChart` for a daily series, `Sparkline` in table cells, `Histogram` for
+  a spread, `BarList` for a few labelled counts.
+- Tables go in `TableFrame`: grey rounded header row, semi-bold labels, no
+  vertical rules, a rule between rows. Filters above a table use one control
+  per kind (segmented tabs for status, a Dew `Select` for tool) so groups do
+  not run together.
+- Both themes and 375px are checked before merging.

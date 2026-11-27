@@ -1,87 +1,66 @@
 .header {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-150);
-  padding: var(--spacing-300) var(--spacing-500) var(--spacing-250);
-  flex-shrink: 0;
-}
-
-.titleRow {
-  display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-300);
+  gap: var(--spacing-200) var(--spacing-300);
   flex-wrap: wrap;
+  min-height: 64px;
+  padding: var(--spacing-150) var(--spacing-300);
+  border-bottom: 1px solid var(--fw-line);
 }
 
 .titleBlock {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-050);
   min-width: 0;
-  flex: 1 1 20rem;
 }
 
 .title {
   margin: 0;
-  font-size: 24px;
-  line-height: 32px;
-  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  font-size: 18px;
+  line-height: 28px;
   font-weight: var(--font-weight-semi-bold);
   overflow-wrap: anywhere;
 }
 
+/* With a breadcrumb the last crumb is the visible title; the h1 stays for screen readers. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 .period {
-  flex: none;
-  width: auto !important;
-}
-
-.description {
-  margin: 0;
-  max-width: 40rem;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.context {
   display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
   flex-wrap: wrap;
-  gap: var(--spacing-100) var(--spacing-400);
-  margin: 0;
-  padding-top: var(--spacing-150);
-  border-top: 1px solid var(--color-boundary-border-mildest);
+}
+
+.range {
+  color: var(--color-text-secondary);
   font-size: 12px;
   line-height: 16px;
 }
 
-.context > div {
-  display: flex;
-  gap: var(--spacing-075);
+.lag {
+  color: var(--color-text-semantic-warning);
 }
 
-.context dt {
-  color: var(--color-text-placeholder);
-}
-
-.context dd {
-  margin: 0;
-  color: var(--color-text-primary);
-  font-weight: var(--font-weight-medium);
+.tabs {
+  flex: none;
+  width: auto !important;
 }
 
 .body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--spacing-100) var(--spacing-500) var(--spacing-800);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-600);
+  gap: var(--spacing-200);
+  padding: var(--spacing-200) var(--spacing-300) var(--spacing-500);
 }
 
-/* The body scrolls; its children must keep their height instead of shrinking to fit. */
 .body > * {
   flex-shrink: 0;
 }

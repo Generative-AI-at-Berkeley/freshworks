@@ -1,23 +1,23 @@
 'use client';
 
-import { Card, Search, SegmentedTabs, Table, Tag } from '@freshworks/dew-components';
+import { Search, SegmentedTabs, Select, Table } from '@freshworks/dew-components';
 import type { api } from '@fwcoach/contracts';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 
 import { Meter, Sparkline, TrendChart } from '@/components/common/charts';
+import { usePaged } from '@/components/common/pager';
 import { Section } from '@/components/common/section';
 import { StatusLabel } from '@/components/common/status';
 import { TableFrame } from '@/components/common/table-frame';
 import { EmptyState, QueryView } from '@/components/common/states';
-import { Defined, Delta, type DeltaTone } from '@/components/common/summary';
+import { Delta, type DeltaTone, Figure, Summary } from '@/components/common/summary';
 import { Value } from '@/components/common/value';
 import { Page } from '@/components/layout/page';
 import { ROUTES } from '@/config/constants';
 import { harnessLabel } from '@/config/labels';
 import { useWithRange } from '@/hooks/use-range';
-import { useSession } from '@/hooks/use-session';
 import { useSkillAdoption } from '@/hooks/use-skill-adoption';
 import { formatCount, formatPercent, formatPointsDelta } from '@/lib/format';
 import { rollingMean } from '@/lib/range';
@@ -29,13 +29,7 @@ import {
   sortSkillRows,
   StatusFilter,
 } from '@/lib/skill-rows';
-import {
-  NEEDS_ATTENTION,
-  nextStep,
-  SkillStatus,
-  statusReason,
-  THRESHOLDS,
-} from '@/lib/skill-status';
+import { NEEDS_ATTENTION, SkillStatus, statusReason, THRESHOLDS } from '@/lib/skill-status';
 
 import styles from './skills-view.module.css';
 
@@ -46,11 +40,61 @@ function toneOf(text: string | null): DeltaTone {
   return text.startsWith('+') ? 'up' : 'down';
 }
 
-/**
- * The headline: of the engineers this person can see, how many use shared
- * skills at all, and the path from installed to used to still using.
- */
-function Overview({
+/** KPI cards: how many engineers in scope have, use, and keep using shared skills. */
+function Kpis({
+  data,
+  previous,
+  days,
+  attention,
+}: {
+  data: api.SkillAdoption;
+  previous: api.SkillAdoption | undefined;
+  days: number;
+  attention: number;
+}) {
+  const t = data.totals;
+  const of = `of ${formatCount(t.engineersInScope)}`;
+  const rate = share(t.engineersUsingSkills, t.engineersInScope);
+  const before = previous
+    ? share(previous.totals.engineersUsingSkills, previous.totals.engineersInScope)
+    : null;
+  const delta = formatPointsDelta(rate, before);
+  return (
+    <Summary>
+      <Figure
+        label="Engineers using skills"
+        definition="Ran at least one shared skill in the period, out of engineers in scope."
+        value={<Value value={rate} format={formatPercent} />}
+        delta={
+          delta && delta !== 'No change' ? (
+            <Delta text={delta} tone={toneOf(delta)} against={`vs previous ${String(days)} days`} />
+          ) : undefined
+        }
+        note={`${formatCount(t.engineersUsingSkills)} of ${formatCount(t.engineersInScope)} engineers`}
+      />
+      <Figure
+        label="Installed a skill"
+        definition="Have at least one shared skill installed at the end of the period."
+        value={formatCount(t.engineersWithSkills)}
+        of={of}
+      />
+      <Figure
+        label="Active last 7 days"
+        definition="Ran a shared skill in the final week. The best sign of a habit."
+        value={formatCount(t.engineersUsingLast7Days)}
+        of={of}
+      />
+      <Figure
+        label="Skills needing attention"
+        definition={`Not activated, declining, or under ${formatPercent(THRESHOLDS.low)} of installers using it.`}
+        value={formatCount(attention)}
+        of={`of ${formatCount(data.skills.length)}`}
+      />
+    </Summary>
+  );
+}
+
+function DailyActive({
   data,
   previous,
   days,
@@ -59,29 +103,6 @@ function Overview({
   previous: api.SkillAdoption | undefined;
   days: number;
 }) {
-  const t = data.totals;
-  const rate = share(t.engineersUsingSkills, t.engineersInScope);
-  const before = previous
-    ? share(previous.totals.engineersUsingSkills, previous.totals.engineersInScope)
-    : null;
-  const delta = formatPointsDelta(rate, before);
-  const funnel = [
-    {
-      label: 'Have a shared skill installed',
-      value: t.engineersWithSkills,
-      definition: 'At least one shared skill installed at the end of the period.',
-    },
-    {
-      label: 'Used one in this period',
-      value: t.engineersUsingSkills,
-      definition: 'Ran at least one shared skill on any day in the period.',
-    },
-    {
-      label: 'Used one in the last 7 days',
-      value: t.engineersUsingLast7Days,
-      definition: 'Ran at least one shared skill in the final week. The best sign of a habit.',
-    },
-  ];
   const trendDays = data.totals.trend.map((point) => point.day);
   const series = [
     {
@@ -99,62 +120,24 @@ function Overview({
         ]
       : []),
   ];
-
   return (
-    <Card variant="outlined" padding="lg" as="section" aria-label="Adoption overview">
-      <div className={styles.overview}>
-        <div className={styles.headline}>
-          <p className={styles.kpiLabel}>Engineers using shared skills</p>
-          <p className={styles.kpi}>
-            <Value value={rate} format={formatPercent} />
-          </p>
-          <p className={styles.kpiNote}>
-            {`${formatCount(t.engineersUsingSkills)} of ${formatCount(t.engineersInScope)} engineers in scope used at least one shared skill.`}
-          </p>
-          {delta && (
-            <Delta text={delta} tone={toneOf(delta)} against={`vs previous ${String(days)} days`} />
-          )}
-          <ul className={styles.funnel}>
-            {funnel.map((step) => {
-              const part = share(step.value, t.engineersInScope) ?? 0;
-              return (
-                <li key={step.label} className={styles.step}>
-                  <div className={styles.stepLabel}>
-                    <Defined label={step.label} definition={step.definition} />
-                  </div>
-                  <span className={styles.stepValue}>
-                    {formatCount(step.value)}
-                    <span className={styles.stepShare}>{formatPercent(part)}</span>
-                  </span>
-                  <Meter
-                    share={part}
-                    label={`${step.label}: ${formatCount(step.value)} of ${formatCount(t.engineersInScope)}`}
-                  />
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <div className={styles.chart}>
-          <p className={styles.chartTitle}>
-            Engineers using any shared skill per day, 7-day average
-          </p>
-          {trendDays.length > 1 ? (
-            <TrendChart
-              days={trendDays}
-              series={series}
-              unit="engineers a day"
-              format={(value) => value.toFixed(1)}
-            />
-          ) : (
-            <EmptyState
-              title="Not enough days"
-              description="Pick a longer period to see a trend."
-            />
-          )}
-        </div>
-      </div>
-    </Card>
+    <Section
+      title="Daily active engineers"
+      info="Engineers who ran any shared skill each day, as a 7-day average."
+      height={WIDGET_HEIGHT}
+    >
+      {trendDays.length > 1 ? (
+        <TrendChart
+          days={trendDays}
+          series={series}
+          height={276}
+          unit="engineers a day"
+          format={(value) => value.toFixed(1)}
+        />
+      ) : (
+        <EmptyState title="Not enough days" description="Pick a longer period to see a trend." />
+      )}
+    </Section>
   );
 }
 
@@ -166,82 +149,76 @@ function InsightItem({ row }: { row: SkillRow }) {
         <NextLink href={withRange(ROUTES.skill(row.id))} className={styles.skillLink}>
           {row.skill.name}
         </NextLink>
-        <span className={styles.tool}>{harnessLabel(row.skill.harness)}</span>
-        <span className={styles.insightStatus}>
-          <StatusLabel status={row.status} />
-        </span>
+        <StatusLabel status={row.status} />
       </div>
       <p className={styles.reason}>{statusReason(row.skill, row.status)}</p>
-      <p className={styles.next}>{nextStep(row.status)}</p>
     </li>
   );
 }
 
-/** Groups skills by what a manager would do about them. Strong and weak never share a list. */
-function Insights({ rows }: { rows: readonly SkillRow[] }) {
-  const attention = sortSkillRows(
-    rows.filter((row) => NEEDS_ATTENTION.has(row.status)),
-    SortKey.Status,
-    false,
+const WIDGET_HEIGHT = 400;
+
+const StatusTab = {
+  Attention: 'attention',
+  Strong: 'strong',
+} as const;
+type StatusTab = (typeof StatusTab)[keyof typeof StatusTab];
+
+/** Skills by what to do about them, three to a page so the card keeps its height. */
+function StatusCard({
+  attention,
+  strong,
+}: {
+  attention: readonly SkillRow[];
+  strong: readonly SkillRow[];
+}) {
+  const [tab, setTab] = useState<StatusTab>(
+    attention.length > 0 ? StatusTab.Attention : StatusTab.Strong,
   );
-  const strong = sortSkillRows(
-    rows.filter((row) => row.status === SkillStatus.Strong),
-    SortKey.Adoption,
-    true,
-  );
-  const tooFew = rows.filter((row) => row.status === SkillStatus.TooFew);
+  const rows = tab === StatusTab.Attention ? attention : strong;
+  const { visible, nav } = usePaged(rows, 3);
   return (
     <Section
-      title="Where to act"
-      hint={`Statuses come from each skill's own numbers. Low is under ${formatPercent(THRESHOLDS.low)} of installers using it, strong is ${formatPercent(THRESHOLDS.strong)} or more, declining is daily users down by ${formatPercent(1 - THRESHOLDS.decline)} or more week over week.`}
+      title="Skill status"
+      info={`Needs attention: not activated, declining (daily users down ${formatPercent(1 - THRESHOLDS.decline)} or more week over week), or under ${formatPercent(THRESHOLDS.low)} of installers using it. Working well: ${formatPercent(THRESHOLDS.strong)} or more. Under ${String(THRESHOLDS.minInstalls)} installs is not judged.`}
+      height={WIDGET_HEIGHT}
+      actions={
+        <SegmentedTabs
+          className={styles.segments}
+          size="mini"
+          value={tab}
+          onValueChange={(value) => {
+            setTab(value as StatusTab);
+          }}
+        >
+          <SegmentedTabs.List aria-label="Skill status">
+            <SegmentedTabs.Trigger value={StatusTab.Attention}>
+              {`Needs attention (${String(attention.length)})`}
+            </SegmentedTabs.Trigger>
+            <SegmentedTabs.Trigger value={StatusTab.Strong}>
+              {`Working well (${String(strong.length)})`}
+            </SegmentedTabs.Trigger>
+          </SegmentedTabs.List>
+        </SegmentedTabs>
+      }
+      footer={nav}
     >
-      <div className={styles.insights}>
-        <Card variant="outlined" padding="md" className={styles.column}>
-          <h3 className={styles.columnTitle}>
-            Needs attention <span className={styles.count}>{attention.length}</span>
-          </h3>
-          {attention.length === 0 ? (
-            <p className={styles.none}>Nothing needs attention in this period.</p>
-          ) : (
-            <ul className={styles.insightList}>
-              {attention.map((row) => (
-                <InsightItem key={row.id} row={row} />
-              ))}
-            </ul>
-          )}
-        </Card>
-        <Card variant="outlined" padding="md" className={styles.column}>
-          <h3 className={styles.columnTitle}>
-            Working well <span className={styles.count}>{strong.length}</span>
-          </h3>
-          {strong.length === 0 ? (
-            <p className={styles.none}>No skill has reached strong adoption yet.</p>
-          ) : (
-            <ul className={styles.insightList}>
-              {strong.map((row) => (
-                <InsightItem key={row.id} row={row} />
-              ))}
-            </ul>
-          )}
-          {tooFew.length > 0 && (
-            <p className={styles.footnote}>
-              {`Not judged yet, under ${String(THRESHOLDS.minInstalls)} installs: ${tooFew.map((row) => row.skill.name).join(', ')}.`}
-            </p>
-          )}
-        </Card>
-      </div>
+      {rows.length === 0 ? (
+        <p className={styles.none}>
+          {tab === StatusTab.Attention
+            ? 'Nothing needs attention in this period.'
+            : 'No skill has reached strong adoption yet.'}
+        </p>
+      ) : (
+        <ul className={styles.insightList}>
+          {visible.map((row) => (
+            <InsightItem key={row.id} row={row} />
+          ))}
+        </ul>
+      )}
     </Section>
   );
 }
-
-const SORT_LABEL: Record<string, string> = {
-  name: 'skill name',
-  status: 'status',
-  adoption: 'adoption',
-  dailyUsers: 'daily users',
-  uses: 'uses',
-  firstUse: 'days to first use',
-};
 
 const SORTABLE: Record<string, SortKey> = {
   name: SortKey.Name,
@@ -263,16 +240,22 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
   ]);
   const tools = useMemo(() => [...new Set(rows.map((row) => row.skill.harness))].sort(), [rows]);
   const sort = sorting[0] ?? { id: 'status', desc: false };
-  const visible = sortSkillRows(
+  const matching = sortSkillRows(
     filterSkillRows(rows, { search, status, harness }),
     SORTABLE[sort.id] ?? SortKey.Status,
     sort.desc,
   );
+  const { visible, nav } = usePaged(matching, 5);
+  const toolOptions = [
+    { value: 'all', label: 'All tools' },
+    ...tools.map((tool) => ({ value: tool, label: harnessLabel(tool) })),
+  ];
 
   return (
     <Section
       title="All skills"
-      hint="Adoption is engineers who used a skill in the period, out of engineers who have it installed. Select a row for the full picture."
+      info="Adoption is engineers who used a skill in the period, out of engineers who have it installed. Users per day averages the last 7 days."
+      footer={nav}
     >
       <div className={styles.toolbar}>
         <div className={styles.search}>
@@ -303,21 +286,16 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
           </SegmentedTabs.List>
         </SegmentedTabs>
         {tools.length > 1 && (
-          <SegmentedTabs
-            className={styles.segments}
-            size="mini"
-            value={harness}
-            onValueChange={setHarness}
-          >
-            <SegmentedTabs.List aria-label="Filter by tool">
-              <SegmentedTabs.Trigger value="all">All tools</SegmentedTabs.Trigger>
-              {tools.map((tool) => (
-                <SegmentedTabs.Trigger key={tool} value={tool}>
-                  {harnessLabel(tool)}
-                </SegmentedTabs.Trigger>
-              ))}
-            </SegmentedTabs.List>
-          </SegmentedTabs>
+          <div className={styles.toolSelect}>
+            <Select
+              aria-label="Filter by tool"
+              options={toolOptions}
+              value={toolOptions.find((option) => option.value === harness) ?? toolOptions[0]}
+              onValueChange={(option) => {
+                setHarness(option ? option.value : 'all');
+              }}
+            />
+          </div>
         )}
       </div>
       {visible.length === 0 ? (
@@ -332,7 +310,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
             enableSorting
             sortingState={sorting}
             onSortChange={setSorting}
-            data={visible}
+            data={[...visible]}
             onRowClick={(row) => {
               router.push(withRange(ROUTES.skill(row.id)));
             }}
@@ -382,12 +360,9 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
                           {`${formatCount(skill.activeEngineers)} of ${formatCount(skill.installedEngineers)}`}
                         </span>
                         {delta && delta !== 'No change' && (
-                          <Tag
-                            variant={toneOf(delta) === 'up' ? 'green' : 'red'}
-                            title={`Change in adoption vs the previous ${String(days)} days`}
-                          >
-                            {delta}
-                          </Tag>
+                          <span title={`Change in adoption vs the previous ${String(days)} days`}>
+                            <Delta text={delta} tone={toneOf(delta)} />
+                          </span>
                         )}
                       </span>
                       <Meter
@@ -402,7 +377,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
               {
                 id: 'dailyUsers',
                 accessorFn: (row: SkillRow) => row.week?.current ?? null,
-                header: 'Daily users, last 7 days',
+                header: 'Users per day',
                 size: 180,
                 cell: ({ row }) => {
                   const { week } = row.original;
@@ -446,7 +421,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
               {
                 id: 'firstUse',
                 accessorFn: (row: SkillRow) => row.skill.medianDaysToFirstUse,
-                header: 'Median days to first use',
+                header: 'First use',
                 size: 140,
                 cell: ({ row }) => (
                   <Value
@@ -460,9 +435,6 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
           />
         </TableFrame>
       )}
-      <p className={styles.footnote}>
-        {`Showing ${String(visible.length)} of ${String(rows.length)} skills, sorted by ${SORT_LABEL[sort.id] ?? 'status'}${sort.id === 'status' ? ', most urgent first' : ''}.`}
-      </p>
     </Section>
   );
 }
@@ -474,21 +446,8 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
  */
 export function SkillsView() {
   const { current, previous, days } = useSkillAdoption();
-  const session = useSession();
-  const org = session.data ? (session.data.orgUnitName ?? session.data.orgUnitId) : undefined;
-  const scope =
-    org && current.data
-      ? `${org}, ${formatCount(current.data.totals.engineersInScope)} engineers`
-      : org;
-
   return (
-    <Page
-      title="Skill adoption"
-      description="Whether engineers use the shared skills they have installed, and which skills need a push."
-      scope={scope}
-      dataThrough={current.data?.dataThrough}
-      compares
-    >
+    <Page title="Skill adoption" dataThrough={current.data?.dataThrough}>
       <QueryView query={current}>
         {(data) => {
           if (data.skills.length === 0) {
@@ -500,10 +459,23 @@ export function SkillsView() {
             );
           }
           const rows = buildSkillRows(data, previous);
+          const attention = sortSkillRows(
+            rows.filter((row) => NEEDS_ATTENTION.has(row.status)),
+            SortKey.Status,
+            false,
+          );
+          const strong = sortSkillRows(
+            rows.filter((row) => row.status === SkillStatus.Strong),
+            SortKey.Adoption,
+            true,
+          );
           return (
             <>
-              <Overview data={data} previous={previous} days={days} />
-              <Insights rows={rows} />
+              <Kpis data={data} previous={previous} days={days} attention={attention.length} />
+              <div className={styles.grid}>
+                <DailyActive data={data} previous={previous} days={days} />
+                <StatusCard attention={attention} strong={strong} />
+              </div>
               <SkillsTable rows={rows} days={days} />
             </>
           );

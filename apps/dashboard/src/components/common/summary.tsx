@@ -1,24 +1,20 @@
 'use client';
 
-import { Card, Tag, Tooltip } from '@freshworks/dew-components';
+import { Card, Icon, Tooltip } from '@freshworks/dew-components';
 import type { ReactNode } from 'react';
 
 import styles from './summary.module.css';
 
-/** A row of figures in one Dew card, divided by rules. */
+/** A row of KPI cards, one Dew card per number, as on Freshworks analytics pages. */
 export function Summary({ children }: { children: ReactNode }) {
-  return (
-    <Card variant="outlined" padding="md">
-      <div className={styles.strip}>{children}</div>
-    </Card>
-  );
+  return <div className={styles.row}>{children}</div>;
 }
 
 export type DeltaTone = 'up' | 'down' | 'flat';
 
-const DELTA_VARIANT = { up: 'green', down: 'red', flat: 'gray' } as const;
+const ARROW = { up: '▲', down: '▼', flat: '' } as const;
 
-/** A change against the previous period. Tone says direction only, not good or bad. */
+/** A change against the previous period. Color says direction only, not good or bad. */
 export function Delta({
   text,
   tone,
@@ -28,11 +24,23 @@ export function Delta({
   tone: DeltaTone;
   against?: string;
 }) {
-  return (
-    <span className={styles.delta}>
-      <Tag variant={DELTA_VARIANT[tone]}>{text}</Tag>
-      {against && <span className={styles.against}>{against}</span>}
+  const delta = (
+    <span className={styles.delta} data-tone={tone}>
+      {ARROW[tone] && (
+        <span className={styles.arrow} aria-hidden="true">
+          {ARROW[tone]}
+        </span>
+      )}
+      {text}
     </span>
+  );
+  if (!against) return delta;
+  return (
+    <Tooltip content={against} placement="top">
+      <span tabIndex={0} className={styles.deltaTip}>
+        {delta}
+      </span>
+    </Tooltip>
   );
 }
 
@@ -40,11 +48,14 @@ export function Delta({
 export function Defined({ label, definition }: { label: string; definition?: string }) {
   if (!definition) return <>{label}</>;
   return (
-    <Tooltip content={definition} placement="top-start" width={260}>
-      <span className={styles.defined} tabIndex={0}>
-        {label}
-      </span>
-    </Tooltip>
+    <span className={styles.definedRow}>
+      {label}
+      <Tooltip content={definition} placement="top-start" width={260}>
+        <span className={styles.defined} tabIndex={0} role="img" aria-label={definition}>
+          <Icon name="CircleInfo" size="sm" />
+        </span>
+      </Tooltip>
+    </span>
   );
 }
 
@@ -52,21 +63,28 @@ interface FigureProps {
   label: string;
   value: ReactNode;
   of?: string;
+  /** Usually a Delta; sits beside the value. */
+  delta?: ReactNode;
   note?: ReactNode;
   definition?: string;
 }
 
-export function Figure({ label, value, of, note, definition }: FigureProps) {
+export function Figure({ label, value, of, delta, note, definition }: FigureProps) {
   return (
-    <div className={styles.cell}>
-      <div className={styles.label}>
-        <Defined label={label} definition={definition} />
+    <Card variant="outlined" padding="md" className={`fw-card ${styles.card}`}>
+      <div className={styles.cell}>
+        <div className={styles.label}>
+          <Defined label={label} definition={definition} />
+        </div>
+        <div className={styles.valueRow}>
+          <p className={styles.value}>
+            {value}
+            {of && <span className={styles.of}> {of}</span>}
+          </p>
+          {delta}
+        </div>
+        {note && <div className={styles.note}>{note}</div>}
       </div>
-      <p className={styles.value}>
-        {value}
-        {of && <span className={styles.of}> {of}</span>}
-      </p>
-      {note && <div className={styles.note}>{note}</div>}
-    </div>
+    </Card>
   );
 }

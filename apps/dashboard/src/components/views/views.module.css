@@ -1,31 +1,5 @@
 /* Layout shared by the dashboard views. Colours come from Dew tokens only. */
 
-.attention {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--color-boundary-semantic-warning-mild);
-  border-radius: var(--border-radius-medium);
-  background: var(--color-fill-semantic-warning-mildest);
-}
-
-.attentionItem {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--spacing-200);
-  flex-wrap: wrap;
-  padding: var(--spacing-150) var(--spacing-250);
-}
-
-.attentionItem + .attentionItem {
-  border-top: 1px solid var(--color-boundary-semantic-warning-mildest);
-}
-
-.attentionText {
-  margin: 0;
-  min-width: 0;
-}
-
 .skillName {
   font-weight: var(--font-weight-medium);
 }
@@ -33,7 +7,7 @@
 .personCell {
   display: flex;
   align-items: center;
-  gap: var(--spacing-150);
+  gap: 12px;
   min-width: 0;
 }
 
@@ -47,19 +21,19 @@
 .go {
   display: flex;
   justify-content: flex-end;
-  color: var(--color-icon-secondary);
+  color: var(--fw-ink-3);
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-075);
+  gap: 6px;
 }
 
 .twoCol {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
-  gap: var(--spacing-400);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 28rem), 1fr));
+  gap: var(--spacing-200);
   align-items: start;
 }
 
@@ -67,24 +41,76 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border: 1px solid var(--color-boundary-border-mildest);
-  border-radius: var(--border-radius-medium);
 }
 
 .listItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--spacing-200);
-  padding: var(--spacing-150) var(--spacing-200);
+  gap: 16px;
+  min-height: 48px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--fw-rule);
   min-width: 0;
 }
 
-.listItem + .listItem {
-  border-top: 1px solid var(--color-boundary-border-mildest);
+.listItem:first-child {
+  padding-top: 0;
+}
+
+.listItem:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.meterCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 15rem;
+  max-width: 55%;
+}
+
+.figure {
+  flex-shrink: 0;
+  color: var(--fw-ink-2);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--border-radius-small);
+  background: var(--fw-frame);
+  color: var(--fw-ink);
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .muted {
-  color: var(--color-text-secondary);
+  color: var(--fw-ink-3);
   font-size: 13px;
+}
+
+.shareCell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 9rem;
+}
+
+.shareTop {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.shareValue {
+  color: var(--fw-ink);
+  font-weight: 600;
 }

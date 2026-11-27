@@ -1,5 +1,6 @@
 'use client';
 
+import { Card } from '@freshworks/dew-components';
 import type { api } from '@fwcoach/contracts';
 
 import { BarList, TrendChart } from '@/components/common/charts';
@@ -10,7 +11,6 @@ import { Delta, type DeltaTone, Figure, Summary } from '@/components/common/summ
 import { Value } from '@/components/common/value';
 import { Page } from '@/components/layout/page';
 import { ROUTES } from '@/config/constants';
-import { harnessLabel } from '@/config/labels';
 import { useSkillAdoption } from '@/hooks/use-skill-adoption';
 import { formatCount, formatCountDelta, formatPercent, formatPointsDelta } from '@/lib/format';
 import {
@@ -49,55 +49,57 @@ function Detail({
 
   return (
     <>
-      <section className={styles.verdict} aria-label="Status">
-        <StatusLabel status={status} />
-        <p className={styles.reason}>{statusReason(skill, status)}</p>
-        <p className={styles.next}>{nextStep(status)}</p>
-      </section>
+      <Card variant="outlined" padding="md" as="section" aria-label="Status" className="fw-card">
+        <div className={styles.verdict}>
+          <StatusLabel status={status} />
+          <div>
+            <p className={styles.reason}>{statusReason(skill, status)}</p>
+            <p className={styles.next}>{nextStep(status)}</p>
+          </div>
+        </div>
+      </Card>
 
       <Summary>
         <Figure
           label="Adoption"
           definition="Engineers who used it in the period, out of engineers who have it installed."
           value={<Value value={rate} format={formatPercent} />}
-          note={
-            <>
-              <span>{`${formatCount(skill.activeEngineers)} of ${formatCount(skill.installedEngineers)} installers`}</span>
-              {rateDelta && (
-                <>
-                  <br />
-                  <Delta text={rateDelta} tone={tone(rateDelta)} against={against} />
-                </>
-              )}
-            </>
+          delta={
+            rateDelta && rateDelta !== 'No change' ? (
+              <Delta text={rateDelta} tone={tone(rateDelta)} against={against} />
+            ) : undefined
           }
+          note={`${formatCount(skill.activeEngineers)} of ${formatCount(skill.installedEngineers)} installed`}
         />
         <Figure
-          label="Installed"
-          definition="Engineers with it installed at the end of the period."
-          value={formatCount(skill.installedEngineers)}
-          of="engineers"
-        />
-        <Figure
-          label="Daily users, last 7 days"
-          definition="Average engineers using it per day over the final week of the period."
+          label="Daily users"
+          definition="Average engineers using it per day over the last 7 days, against the 7 days before."
           value={
             week ? week.current.toFixed(1) : <span className={styles.muted}>Needs 14 days</span>
           }
-          note={week ? `${week.prior.toFixed(1)} the week before` : undefined}
+          delta={
+            week && Math.abs(week.current - week.prior) >= 0.05 ? (
+              <Delta
+                text={`${week.current > week.prior ? '+' : '-'}${Math.abs(week.current - week.prior).toFixed(1)}`}
+                tone={week.current > week.prior ? 'up' : 'down'}
+                against="vs the week before"
+              />
+            ) : undefined
+          }
+          note="Last 7 days"
         />
         <Figure
           label="Uses"
           definition="Times the skill ran in the period, across all engineers."
           value={formatCount(skill.invocations)}
-          note={
-            usesDelta ? (
+          delta={
+            usesDelta && usesDelta !== 'No change' ? (
               <Delta text={usesDelta} tone={tone(usesDelta)} against={against} />
             ) : undefined
           }
         />
         <Figure
-          label="Median days to first use"
+          label="Days to first use"
           definition="Days from install to first run, median over engineers who ran it."
           value={
             <Value
@@ -106,57 +108,51 @@ function Detail({
               missing="unused"
             />
           }
-          of={
-            skill.medianDaysToFirstUse === null
-              ? undefined
-              : skill.medianDaysToFirstUse === 1
-                ? 'day'
-                : 'days'
-          }
+          note="Median"
         />
       </Summary>
 
-      <Section
-        title="Daily users"
-        hint="Distinct engineers who ran the skill each day. Weekends are usually quiet."
-      >
-        {trendDays.length > 1 ? (
-          <TrendChart
-            days={trendDays}
-            unit="engineers"
-            series={[
-              {
-                label: 'This period',
-                kind: 'primary',
-                values: skill.trend.map((p) => p.activeEngineers),
-              },
-              ...(prior && prior.trend.length === trendDays.length
-                ? [
-                    {
-                      label: `Previous ${String(days)} days`,
-                      kind: 'compare' as const,
-                      values: prior.trend.map((p) => p.activeEngineers),
-                    },
-                  ]
-                : []),
-            ]}
-          />
-        ) : (
-          <EmptyState title="Not enough days" description="Pick a longer period to see a trend." />
-        )}
-      </Section>
+      <div className={styles.grid}>
+        <Section
+          title="Daily users"
+          info="Engineers who ran the skill each day. Weekends are usually quiet."
+        >
+          {trendDays.length > 1 ? (
+            <TrendChart
+              days={trendDays}
+              unit="engineers"
+              series={[
+                {
+                  label: 'This period',
+                  kind: 'primary',
+                  values: skill.trend.map((p) => p.activeEngineers),
+                },
+                ...(prior && prior.trend.length === trendDays.length
+                  ? [
+                      {
+                        label: `Previous ${String(days)} days`,
+                        kind: 'compare' as const,
+                        values: prior.trend.map((p) => p.activeEngineers),
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          ) : (
+            <EmptyState
+              title="Not enough days"
+              description="Pick a longer period to see a trend."
+            />
+          )}
+        </Section>
 
-      <Section
-        title="Engineers using it, by department"
-        hint="Where it has caught on. Departments with few users are the place to suggest it next."
-      >
-        {departments.length === 0 ? (
-          <EmptyState
-            title="No department data"
-            description="The API returned no department breakdown for this skill."
-          />
-        ) : (
-          <div className={styles.departments}>
+        <Section title="Users by department">
+          {departments.length === 0 ? (
+            <EmptyState
+              title="No department data"
+              description="The API returned no department breakdown for this skill."
+            />
+          ) : (
             <BarList
               unit="engineers"
               items={departments.map((d) => ({
@@ -165,9 +161,9 @@ function Detail({
                 value: d.activeEngineers,
               }))}
             />
-          </div>
-        )}
-      </Section>
+          )}
+        </Section>
+      </div>
     </>
   );
 }
@@ -184,10 +180,8 @@ export function SkillView({ skillId }: { skillId: string }) {
   return (
     <Page
       title={skill?.name ?? skillId}
-      description={skill ? `A shared skill for ${harnessLabel(skill.harness)}.` : undefined}
       crumbs={[{ label: 'Skill adoption', href: ROUTES.skills }]}
       dataThrough={current.data?.dataThrough}
-      compares
     >
       <QueryView query={current}>
         {() =>
