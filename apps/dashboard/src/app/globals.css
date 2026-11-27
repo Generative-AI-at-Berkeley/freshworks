@@ -20,21 +20,12 @@ a {
   color: inherit;
 }
 
-/*
- * App tokens, built only from Dew variables. One data ink for measured series
- * (Dew chart category 09, a quiet slate teal) so brand blue keeps meaning
- * "you can click this".
- */
+/* App tokens, built only from Dew variables. Charts use Dew's first chart category color. */
 :root {
-  --fw-ink-data: var(--color-chart-category-09);
+  --fw-ink-data: var(--color-chart-category-01);
 }
 
 /* Numbers line up in columns everywhere. */
 body {
   font-variant-numeric: tabular-nums;
-}
-
-:focus-visible {
-  outline: 2px solid var(--color-boundary-brand);
-  outline-offset: 2px;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Avatar, Icon, IconButton } from '@freshworks/dew-components';
+import { Avatar, Card, Icon, IconButton } from '@freshworks/dew-components';
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import { type ReactNode, useSyncExternalStore } from 'react';
@@ -53,16 +53,16 @@ function NavLinks({
 function Scope() {
   const session = useSession();
   const data = session.data;
-  if (!data) return <div className={styles.scope} aria-hidden="true" />;
+  if (!data) return <div className={styles.scopePlaceholder} aria-hidden="true" />;
   const viewer = data.displayName ?? data.engineerId;
   return (
-    <div className={styles.scope}>
+    <Card variant="outlined" padding="sm" className={styles.scope}>
       <p className={styles.org}>{data.orgUnitName ?? data.orgUnitId}</p>
       <div className={styles.viewer}>
         <Avatar name={viewer} size="xs" />
         <span>{viewer}</span>
       </div>
-    </div>
+    </Card>
   );
 }
 

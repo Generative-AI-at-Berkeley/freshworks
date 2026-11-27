@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, SegmentedTabs, Table } from '@freshworks/dew-components';
+import { Card, Search, SegmentedTabs, Table, Tag } from '@freshworks/dew-components';
 import type { api } from '@fwcoach/contracts';
 import NextLink from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -11,7 +11,7 @@ import { Section } from '@/components/common/section';
 import { StatusLabel } from '@/components/common/status';
 import { TableFrame } from '@/components/common/table-frame';
 import { EmptyState, QueryView } from '@/components/common/states';
-import { Delta, type DeltaTone } from '@/components/common/summary';
+import { Defined, Delta, type DeltaTone } from '@/components/common/summary';
 import { Value } from '@/components/common/value';
 import { Page } from '@/components/layout/page';
 import { ROUTES } from '@/config/constants';
@@ -101,53 +101,60 @@ function Overview({
   ];
 
   return (
-    <section className={styles.overview} aria-label="Adoption overview">
-      <div className={styles.headline}>
-        <p className={styles.kpiLabel}>Engineers using shared skills</p>
-        <p className={styles.kpi}>
-          <Value value={rate} format={formatPercent} />
-        </p>
-        <p className={styles.kpiNote}>
-          {`${formatCount(t.engineersUsingSkills)} of ${formatCount(t.engineersInScope)} engineers in scope used at least one shared skill.`}
-        </p>
-        {delta && (
-          <Delta text={delta} tone={toneOf(delta)} against={`vs previous ${String(days)} days`} />
-        )}
-        <ul className={styles.funnel}>
-          {funnel.map((step) => {
-            const part = share(step.value, t.engineersInScope) ?? 0;
-            return (
-              <li key={step.label} className={styles.step}>
-                <span className={styles.stepLabel} title={step.definition}>
-                  {step.label}
-                </span>
-                <span className={styles.stepValue}>
-                  {formatCount(step.value)}
-                  <span className={styles.stepShare}>{formatPercent(part)}</span>
-                </span>
-                <Meter
-                  share={part}
-                  label={`${step.label}: ${formatCount(step.value)} of ${formatCount(t.engineersInScope)}`}
-                />
-              </li>
-            );
-          })}
-        </ul>
+    <Card variant="outlined" padding="lg" as="section" aria-label="Adoption overview">
+      <div className={styles.overview}>
+        <div className={styles.headline}>
+          <p className={styles.kpiLabel}>Engineers using shared skills</p>
+          <p className={styles.kpi}>
+            <Value value={rate} format={formatPercent} />
+          </p>
+          <p className={styles.kpiNote}>
+            {`${formatCount(t.engineersUsingSkills)} of ${formatCount(t.engineersInScope)} engineers in scope used at least one shared skill.`}
+          </p>
+          {delta && (
+            <Delta text={delta} tone={toneOf(delta)} against={`vs previous ${String(days)} days`} />
+          )}
+          <ul className={styles.funnel}>
+            {funnel.map((step) => {
+              const part = share(step.value, t.engineersInScope) ?? 0;
+              return (
+                <li key={step.label} className={styles.step}>
+                  <div className={styles.stepLabel}>
+                    <Defined label={step.label} definition={step.definition} />
+                  </div>
+                  <span className={styles.stepValue}>
+                    {formatCount(step.value)}
+                    <span className={styles.stepShare}>{formatPercent(part)}</span>
+                  </span>
+                  <Meter
+                    share={part}
+                    label={`${step.label}: ${formatCount(step.value)} of ${formatCount(t.engineersInScope)}`}
+                  />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className={styles.chart}>
+          <p className={styles.chartTitle}>
+            Engineers using any shared skill per day, 7-day average
+          </p>
+          {trendDays.length > 1 ? (
+            <TrendChart
+              days={trendDays}
+              series={series}
+              unit="engineers a day"
+              format={(value) => value.toFixed(1)}
+            />
+          ) : (
+            <EmptyState
+              title="Not enough days"
+              description="Pick a longer period to see a trend."
+            />
+          )}
+        </div>
       </div>
-      <div className={styles.chart}>
-        <p className={styles.chartTitle}>Engineers using any shared skill per day, 7-day average</p>
-        {trendDays.length > 1 ? (
-          <TrendChart
-            days={trendDays}
-            series={series}
-            unit="engineers a day"
-            format={(value) => value.toFixed(1)}
-          />
-        ) : (
-          <EmptyState title="Not enough days" description="Pick a longer period to see a trend." />
-        )}
-      </div>
-    </section>
+    </Card>
   );
 }
 
@@ -189,7 +196,7 @@ function Insights({ rows }: { rows: readonly SkillRow[] }) {
       hint={`Statuses come from each skill's own numbers. Low is under ${formatPercent(THRESHOLDS.low)} of installers using it, strong is ${formatPercent(THRESHOLDS.strong)} or more, declining is daily users down by ${formatPercent(1 - THRESHOLDS.decline)} or more week over week.`}
     >
       <div className={styles.insights}>
-        <div className={styles.column}>
+        <Card variant="outlined" padding="md" className={styles.column}>
           <h3 className={styles.columnTitle}>
             Needs attention <span className={styles.count}>{attention.length}</span>
           </h3>
@@ -202,8 +209,8 @@ function Insights({ rows }: { rows: readonly SkillRow[] }) {
               ))}
             </ul>
           )}
-        </div>
-        <div className={styles.column}>
+        </Card>
+        <Card variant="outlined" padding="md" className={styles.column}>
           <h3 className={styles.columnTitle}>
             Working well <span className={styles.count}>{strong.length}</span>
           </h3>
@@ -221,7 +228,7 @@ function Insights({ rows }: { rows: readonly SkillRow[] }) {
               {`Not judged yet, under ${String(THRESHOLDS.minInstalls)} installs: ${tooFew.map((row) => row.skill.name).join(', ')}.`}
             </p>
           )}
-        </div>
+        </Card>
       </div>
     </Section>
   );
@@ -375,13 +382,12 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
                           {`${formatCount(skill.activeEngineers)} of ${formatCount(skill.installedEngineers)}`}
                         </span>
                         {delta && delta !== 'No change' && (
-                          <span
-                            className={styles.change}
-                            data-tone={toneOf(delta)}
+                          <Tag
+                            variant={toneOf(delta) === 'up' ? 'green' : 'red'}
                             title={`Change in adoption vs the previous ${String(days)} days`}
                           >
                             {delta}
-                          </span>
+                          </Tag>
                         )}
                       </span>
                       <Meter
@@ -397,7 +403,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
                 id: 'dailyUsers',
                 accessorFn: (row: SkillRow) => row.week?.current ?? null,
                 header: 'Daily users, last 7 days',
-                size: 170,
+                size: 180,
                 cell: ({ row }) => {
                   const { week } = row.original;
                   if (!week) return <span className={styles.secondary}>Needs 14 days</span>;
@@ -417,7 +423,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
               {
                 id: 'trend',
                 header: `Trend, ${String(days)} days`,
-                size: 150,
+                size: 140,
                 enableSorting: false,
                 cell: ({ row }) => {
                   const points = row.original.skill.trend;

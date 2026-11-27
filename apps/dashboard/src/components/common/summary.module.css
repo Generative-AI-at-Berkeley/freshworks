@@ -1,4 +1,5 @@
 .strip {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
   row-gap: var(--spacing-250);
@@ -55,24 +56,17 @@
 }
 
 .delta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-075);
   font-size: 12px;
   line-height: 16px;
 }
 
-.deltaValue {
-  font-weight: var(--font-weight-medium);
-}
-
-.deltaValue[data-tone='up'] {
-  color: var(--color-text-semantic-success);
-}
-
-.deltaValue[data-tone='down'] {
-  color: var(--color-text-semantic-error);
-}
-
-.deltaValue[data-tone='flat'] {
-  color: var(--color-text-secondary);
+.delta > :first-child {
+  flex: none;
+  max-width: none;
 }
 
 .against {

@@ -1,5 +1,6 @@
 'use client';
 
+import { ProgressLoader } from '@freshworks/dew-components';
 import { type KeyboardEvent, type PointerEvent, useId, useState } from 'react';
 
 import { useWidth } from '@/hooks/use-width';
@@ -8,26 +9,24 @@ import { formatCount, formatDay } from '@/lib/format';
 import styles from './charts.module.css';
 
 /*
- * Hand-built because Dew ships no charts. One data ink (Dew chart category 09,
- * a quiet slate teal) for every measured series; the comparison series is a
- * dashed neutral. Brand blue stays reserved for things you can click.
+ * Hand-built because Dew ships no charts. Measured series use Dew's first
+ * chart category color; the comparison series is a dashed neutral.
  */
 
-/** A share as a thin bar. The number beside it is the reading; the bar is the glance. */
+/** A share as Dew's progress bar. The number beside it is the reading; the bar is the glance. */
 export function Meter({
   share,
   label,
-  tone = 'data',
 }: {
-  /** Null draws an empty track. */
+  /** Null draws an empty bar. */
   share: number | null;
   label: string;
   tone?: 'data' | 'muted';
 }) {
   const clamped = Math.min(1, Math.max(0, share ?? 0));
   return (
-    <span className={styles.meter} role="img" aria-label={label}>
-      <span className={styles.fill} data-tone={tone} style={{ width: `${clamped * 100}%` }} />
+    <span className={styles.meter}>
+      <ProgressLoader value={Math.round(clamped * 100)} max={100} aria-label={label} />
     </span>
   );
 }

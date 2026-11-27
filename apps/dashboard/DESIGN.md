@@ -38,11 +38,14 @@ design system: its components, colours, type and spacing are not redefined here.
 
 ## Color
 
-- One data ink, `--fw-ink-data` (Dew chart category 09), for every measured
+- One data ink, `--fw-ink-data` (Dew chart category 01), for every measured
   series and bar. Comparison series are a dashed neutral.
 - Brand blue only means "you can click this" or "you are here".
 - Semantic colors only for status dots and up or down deltas, always next to
-  a word. Never a tinted warning box.
+  a word, as Dew Tags. Never a tinted warning box.
+- Panels are Dew `Card` (outlined), statuses and changes are Dew `Tag`, shares
+  are Dew `ProgressLoader`, definitions are Dew `Tooltip`. Do not restyle Dew
+  components; only lay them out.
 
 ## Charts
 
@@ -50,7 +53,7 @@ design system: its components, colours, type and spacing are not redefined here.
   keys. Busy daily series show a 7-day average and say so in the title.
 - `Sparkline` for a trend in a table cell, `Histogram` for a spread, `Meter`
   for a share next to its number, `BarList` for a few labelled counts.
-- Tables go in `TableFrame`: no header fill, no vertical rules.
+- Tables go in `TableFrame`, which keeps Dew's table look and only adds scroll.
 
 ## Layout
 

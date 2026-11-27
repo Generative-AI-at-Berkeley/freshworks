@@ -6,21 +6,6 @@
   display: block;
   flex: 1;
   min-width: 48px;
-  height: 4px;
-  border-radius: 2px;
-  background: var(--color-fill-base);
-  overflow: hidden;
-}
-
-.fill {
-  display: block;
-  height: 100%;
-  border-radius: 2px;
-  background: var(--fw-ink-data);
-}
-
-.fill[data-tone='muted'] {
-  background: var(--color-text-placeholder);
 }
 
 .spark {

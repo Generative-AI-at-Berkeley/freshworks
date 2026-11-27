@@ -1,12 +1,10 @@
 /* Skill adoption. Colors are Dew tokens; --fw-ink-data is set in globals.css. */
 
 .overview {
+  width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 19rem) minmax(0, 1fr);
   gap: var(--spacing-500);
-  padding: var(--spacing-300);
-  border: 1px solid var(--color-boundary-border-mildest);
-  border-radius: var(--border-radius-medium);
 }
 
 .headline {
@@ -62,7 +60,6 @@
 
 .stepLabel {
   color: var(--color-text-secondary);
-  cursor: help;
 }
 
 .stepValue {
@@ -101,14 +98,19 @@
   min-width: 0;
 }
 
+/* Dew's card aligns children to the start; these lists should span it. */
+.column > * {
+  align-self: stretch;
+}
+
 .columnTitle {
   display: flex;
   align-items: center;
   gap: var(--spacing-100);
   margin: 0;
   padding-bottom: var(--spacing-100);
-  border-bottom: 1px solid var(--color-boundary-border-mild);
-  font-size: 13px;
+  border-bottom: 1px solid var(--color-boundary-divider);
+  font-size: 14px;
   font-weight: var(--font-weight-semi-bold);
 }
 
@@ -128,7 +130,10 @@
   flex-direction: column;
   gap: var(--spacing-050);
   padding: var(--spacing-200) 0;
-  border-bottom: 1px solid var(--color-boundary-border-mildest);
+}
+
+.insight + .insight {
+  border-top: 1px solid var(--color-boundary-divider);
 }
 
 .insight p {
@@ -236,28 +241,9 @@
   font-size: 12px;
 }
 
-.change {
-  font-size: 12px;
-  font-weight: var(--font-weight-medium);
-}
-
-.change[data-tone='up'] {
-  color: var(--color-text-semantic-success);
-}
-
-.change[data-tone='down'] {
-  color: var(--color-text-semantic-error);
-}
-
 @media (max-width: 900px) {
   .overview {
     grid-template-columns: minmax(0, 1fr);
     gap: var(--spacing-300);
-  }
-}
-
-@media (max-width: 640px) {
-  .overview {
-    padding: var(--spacing-200);
   }
 }
