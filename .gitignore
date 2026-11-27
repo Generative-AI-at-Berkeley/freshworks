@@ -22,3 +22,6 @@ roster*.csv
 # Playwright output (e2e/dashboard).
 test-results/
 playwright-report/
+
+# pnpm test:load output.
+load-results/
