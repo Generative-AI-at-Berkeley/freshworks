@@ -1,0 +1,109 @@
+.row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  gap: var(--spacing-200);
+}
+
+.card {
+  min-width: 0;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-050);
+  width: 100%;
+  min-width: 0;
+}
+
+.cell p {
+  margin: 0;
+}
+
+.label {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.definedRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-075);
+}
+
+.defined {
+  display: inline-flex;
+  color: var(--color-icon-secondary);
+  cursor: help;
+  border-radius: var(--border-radius-small);
+}
+
+.defined:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--spacing-100);
+}
+
+.value {
+  color: var(--color-text-primary);
+  font-size: 28px;
+  line-height: 36px;
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.of {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.note {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-050);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: var(--font-weight-semi-bold);
+  white-space: nowrap;
+}
+
+.delta[data-tone='up'] {
+  color: var(--color-text-semantic-success);
+}
+
+.delta[data-tone='down'] {
+  color: var(--color-text-semantic-error);
+}
+
+.delta[data-tone='flat'] {
+  color: var(--color-text-secondary);
+  font-weight: normal;
+}
+
+.arrow {
+  font-size: 9px;
+}
+
+.deltaTip {
+  display: inline-flex;
+  cursor: help;
+  border-radius: var(--border-radius-small);
+}
+
+.deltaTip:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+}

@@ -1,0 +1,194 @@
+/*
+ * Freshworks' Dew frame: grey container, top bar, icon rail on the left, and
+ * the page on a white panel with a rounded top-left corner.
+ */
+.shell {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'top top'
+    'rail panel';
+  height: 100dvh;
+  background: var(--color-fill-container);
+}
+
+.top {
+  grid-area: top;
+  min-width: 0;
+}
+
+.product {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text-primary);
+  border-radius: var(--border-radius-small);
+}
+
+.product:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 4px;
+}
+
+.avatarSlot {
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+
+.avatarButton {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+}
+
+.avatarButton:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+  min-width: 240px;
+  padding: var(--spacing-200);
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-150);
+}
+
+.name,
+.org {
+  margin: 0;
+}
+
+.name {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.org {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.profileRow {
+  padding-top: var(--spacing-150);
+  border-top: 1px solid var(--fw-line);
+}
+
+.rail {
+  grid-area: rail;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-200);
+  padding: var(--spacing-100) 0;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-100);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-large);
+  color: var(--color-text-secondary);
+  transition: background-color 120ms ease;
+}
+
+.link:hover {
+  background: var(--color-overlay-neutral);
+}
+
+.link[aria-current='page'] {
+  background: var(--color-fill-semantic-info-mildest);
+  border-color: var(--color-boundary-semantic-info-mild);
+  color: var(--color-text-brand);
+}
+
+:global(.dew-dark-theme) .link[aria-current='page'] {
+  background: var(--color-fill-brand);
+  border-color: transparent;
+  color: var(--color-text-on-brand);
+}
+
+.iconActive {
+  display: none;
+}
+
+.link[aria-current='page'] .iconActive {
+  display: inline-flex;
+}
+
+.link[aria-current='page'] .iconRest {
+  display: none;
+}
+
+/* The filled icons carry their own brand fill, which disappears on a brand tile. */
+:global(.dew-dark-theme) .link[aria-current='page'] .iconActive {
+  display: none;
+}
+
+:global(.dew-dark-theme) .link[aria-current='page'] .iconRest {
+  display: inline-flex;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+}
+
+.panel {
+  grid-area: panel;
+  min-width: 0;
+  overflow-y: auto;
+  background: var(--color-fill-surface);
+  border-top-left-radius: 12px;
+  border-top: 1px solid var(--fw-line);
+  border-left: 1px solid var(--fw-line);
+}
+
+/* Phones: the rail turns into a row under the top bar and the panel goes full width. */
+@media (max-width: 640px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      'top'
+      'rail'
+      'panel';
+  }
+
+  .rail,
+  .group {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .rail {
+    padding: 0 0 var(--spacing-100);
+  }
+
+  .panel {
+    border-radius: 0;
+    border-left: 0;
+  }
+}

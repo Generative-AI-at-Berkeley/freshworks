@@ -1,0 +1,136 @@
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: var(--spacing-200);
+  align-items: start;
+}
+
+.toolSelect {
+  width: 11rem;
+}
+
+/*
+ * Dew's table header is sticky at z-index 10. The menu's positioner is
+ * transformed, which traps any z-index set inside it, so it goes on the
+ * positioner itself.
+ */
+:global([role='presentation']):has(> .toolPopup) {
+  z-index: 20;
+}
+
+.insightList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.insight {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-050);
+  padding: var(--spacing-150) 0;
+  border-top: 1px solid var(--fw-line);
+}
+
+.insight:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.insight:last-child {
+  padding-bottom: 0;
+}
+
+.insightHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-100);
+  min-width: 0;
+}
+
+.reason {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.none {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.skillLink {
+  color: var(--color-text-brand);
+  font-weight: var(--font-weight-semi-bold);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.skillLink:hover {
+  text-decoration: underline;
+}
+
+.skillLink:focus-visible {
+  outline: 2px solid var(--color-fill-brand);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-small);
+}
+
+.tool {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.toolbar {
+  margin-bottom: var(--spacing-200);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-150);
+  flex-wrap: wrap;
+}
+
+.search {
+  flex: 0 1 15rem;
+  min-width: 12rem;
+}
+
+.segments {
+  flex: none;
+  width: auto !important;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.rate {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semi-bold);
+}
+
+.secondary {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Table cells stay on one line so every row reads at the same baseline. */
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-100);
+  white-space: nowrap;
+}
+
+.meter {
+  display: inline-flex;
+  width: 48px;
+  flex: none;
+}

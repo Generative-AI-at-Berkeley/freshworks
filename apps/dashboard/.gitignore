@@ -1,0 +1,10 @@
+/.next/
+/out/
+/coverage/
+*.tsbuildinfo
+next-env.d.ts
+.env*
+!.env.example
+
+# Copied from @freshworks/dew-styles at build time. See scripts/copy-dew-fonts.mjs.
+/public/dew/

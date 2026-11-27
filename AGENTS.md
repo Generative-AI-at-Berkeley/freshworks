@@ -53,6 +53,19 @@ Claude Code, Cursor and Codex all read the same rules.
 - Credits stay credits. Cost is `null` when there is no sourced rate. Never `0`.
 - SQL is parameterised. Never concatenate request input into a query.
 
+**Dashboard** (`apps/dashboard`)
+
+- Dew is the design system. Use `@freshworks/dew-components` and Dew's CSS
+  variables. No second component library, no hardcoded colors.
+- The browser calls only this app's `/api` routes. Identity is added server
+  side. Never forward a header the browser sent.
+- Parse every API response with its schema from `packages/contracts`.
+- Unknown renders as "Not measured" or "Not priced", never 0. A cost always
+  shows its coverage.
+- No view lists people ordered by a usage metric. Sort people by name.
+- UI copy: sentence case, no exclamation points, no emoji. Errors say what
+  broke and what to do.
+
 **Everywhere**
 
 - Configuration comes from the environment, validated with Zod in one

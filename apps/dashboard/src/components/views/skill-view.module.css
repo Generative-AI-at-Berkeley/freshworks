@@ -1,0 +1,42 @@
+.verdict {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-150);
+}
+
+.verdict > :first-child {
+  flex: none;
+}
+
+.reason,
+.next {
+  margin: 0;
+}
+
+.reason {
+  color: var(--color-text-primary);
+}
+
+.next {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
+
+.muted {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  font-weight: normal;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: var(--spacing-200);
+  align-items: start;
+}
+
+@media (max-width: 960px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

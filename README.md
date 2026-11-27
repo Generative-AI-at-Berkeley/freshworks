@@ -31,6 +31,7 @@ flowchart LR
 | `services/ingest-mock` | Stand-in for the Freshworks pipeline                    | BE-1             |
 | `services/api`         | Query API, rollup jobs, directory sync, pricing         | Backend team     |
 | `db/migrations`        | Postgres schema as dbmate migrations                    | Backend team     |
+| `apps/dashboard`       | The four dashboard views, on Dew                        | X-3              |
 | `e2e`                  | Acceptance criteria as tests, against the compose stack | Every ticket     |
 | `docs`                 | Architecture, decisions, contracts, formats, runbooks   | Everyone         |
 
@@ -47,6 +48,7 @@ pnpm db:up                 # migrations, as the owner
 pnpm test                  # unit tests
 pnpm dev:ingest            # mock ingest on :4318
 pnpm dev:api               # API on :8080
+pnpm dev:dashboard         # dashboard on :3000, mock data until API_BASE_URL is set
 pnpm --filter @fwcoach/collector dry-run    # what the collector would send
 ```
 

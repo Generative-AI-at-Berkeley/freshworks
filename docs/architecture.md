@@ -6,7 +6,7 @@ The sponsor spec (Fall 2026 Internship Project Specification, section 7)
 asks for a fleet view of AI coding assistant use at Freshworks: who uses which
 harness, at what cost, which skills are catching on, with drill-down along the
 management chain. This repo is the Phase 2 system: collector, ingestion,
-storage, rollups and query API. Dashboards are not in this repo yet.
+storage, rollups, query API and dashboards.
 
 ## Components
 
@@ -102,8 +102,6 @@ and every allowed individual view is written to `access_log`.
 
 ## Not in this repo yet
 
-- **Dashboards.** Spec 7.6 asks for four Dew-styled views. No ticket covers
-  them yet. They will call the query API only.
 - **The VS Code extension work** (Phase 1 of the spec, in the upstream fork).
   If its core parsing library exists, adapters should call it instead of
   re-implementing the same parsing here.

@@ -1,0 +1,79 @@
+/*
+ * Dew's table as Freshworks lists draw it: a grey rounded header row with
+ * semi-bold labels, no vertical rules, one rule between rows, and a hover
+ * fill on rows that open something.
+ */
+.frame {
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.frame :global(table) {
+  min-width: 720px;
+  background: transparent !important;
+  border: none !important;
+}
+
+.frame :global(thead),
+.frame :global(thead tr) {
+  background: transparent !important;
+}
+
+.frame :global(thead th) {
+  height: 40px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: var(--color-fill-container) !important;
+}
+
+:global(.dew-dark-theme) .frame :global(thead th) {
+  background: var(--color-fill-base) !important;
+}
+
+.frame :global(thead th:first-child) {
+  border-top-left-radius: var(--border-radius-medium) !important;
+  border-bottom-left-radius: var(--border-radius-medium) !important;
+}
+
+.frame :global(thead th:last-child) {
+  border-top-right-radius: var(--border-radius-medium) !important;
+  border-bottom-right-radius: var(--border-radius-medium) !important;
+}
+
+.frame :global(thead th),
+.frame :global(thead th span) {
+  color: var(--color-text-primary) !important;
+  font-size: 13px !important;
+  font-weight: var(--font-weight-semi-bold) !important;
+}
+
+.frame :global(thead th),
+.frame :global(tbody td) {
+  padding-left: var(--spacing-200) !important;
+  padding-right: var(--spacing-200) !important;
+}
+
+.frame :global(tbody td) {
+  height: 52px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  vertical-align: middle !important;
+  border: none !important;
+  border-bottom: 1px solid var(--fw-line) !important;
+  background: transparent;
+  font-size: 14px !important;
+}
+
+.frame :global(tbody tr:last-child td) {
+  border-bottom: none !important;
+}
+
+.frame[data-clickable] :global(tbody tr) {
+  cursor: pointer;
+}
+
+.frame[data-clickable] :global(tbody tr:hover td) {
+  background: var(--color-overlay-neutral);
+}

@@ -1,0 +1,73 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-200) var(--spacing-300);
+  flex-wrap: wrap;
+  min-height: 64px;
+  padding: var(--spacing-150) var(--spacing-300);
+  border-bottom: 1px solid var(--fw-line);
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: var(--font-weight-semi-bold);
+  overflow-wrap: anywhere;
+}
+
+/* With a breadcrumb the last crumb is the visible title; the h1 stays for screen readers. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.period {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-200);
+  flex-wrap: wrap;
+}
+
+.range {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.lag {
+  color: var(--color-text-semantic-warning);
+}
+
+.tabs {
+  flex: none;
+  width: auto !important;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-200);
+  padding: var(--spacing-200) var(--spacing-300) var(--spacing-500);
+}
+
+.body > * {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .header,
+  .body {
+    padding-inline: var(--spacing-200);
+  }
+}
