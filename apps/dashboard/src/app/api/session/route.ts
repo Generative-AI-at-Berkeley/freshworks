@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 
 import { PLATFORM_ADMIN_ROLE, ServerMode } from '@/config/enums';
 import { ConfigError, loadServerConfig } from '@/config/server';
+import { problemResponse } from '@/lib/problem-response';
 import type { Session } from '@/lib/session';
 import { MOCK_VIEWER } from '@/mock/org';
 
@@ -15,7 +16,7 @@ export function GET(): Response {
     config = loadServerConfig();
   } catch (error) {
     if (error instanceof ConfigError) {
-      return NextResponse.json({ status: 503, detail: error.message }, { status: 503 });
+      return problemResponse(503, error.message);
     }
     throw error;
   }

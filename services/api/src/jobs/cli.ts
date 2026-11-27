@@ -13,7 +13,9 @@ import { JobName, runJob } from './run-job.js';
  */
 const [name, arg] = process.argv.slice(2);
 const config = loadConfig();
-const pool = createPool(config.databaseUrl);
+// A rollup scans a whole day, which can outlast the per-request statement
+// timeout. The other timeouts still apply.
+const pool = createPool(config.databaseUrl, { ...config.db, statementTimeoutMs: 0 });
 const metricsDir = config.jobMetricsDir;
 
 try {

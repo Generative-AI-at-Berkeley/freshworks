@@ -49,6 +49,13 @@ for (const { path, heading } of PAGES) {
 
     const res = await page.goto(path);
     expect(res?.status()).toBe(200);
+    // A CSP violation logs a console error, so the errors check below proves
+    // the policy allows everything the page loads.
+    const headers = res?.headers() ?? {};
+    expect(headers['content-security-policy']).toMatch(/script-src 'self' 'nonce-[^']+'/);
+    expect(headers['content-security-policy']).toContain("frame-ancestors 'none'");
+    expect(headers['x-content-type-options']).toBe('nosniff');
+    expect(headers['strict-transport-security']).toContain('max-age=');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText(heading);
     await page.waitForLoadState('networkidle');
 

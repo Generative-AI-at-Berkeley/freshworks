@@ -9,9 +9,11 @@ import {
   OtlpLogsRequest,
   REQUEST_ID_HEADER,
 } from '@fwcoach/contracts';
-import Fastify, { type FastifyInstance, type FastifyReply } from 'fastify';
+import Fastify, { type FastifyInstance } from 'fastify';
 
+import { ServerTimeouts } from './config.js';
 import { createMetrics, observeRequests, RecordOutcome, type IngestMetrics } from './metrics.js';
+import { problem, useProblemHandlers } from './problem.js';
 import type { EventStore } from './store/types.js';
 
 export interface AppOptions {
@@ -24,6 +26,8 @@ export interface AppOptions {
   metrics?: IngestMetrics;
   /** Largest request body accepted, in bytes. TODO(BE-1): match the real pipeline once Freshworks shares it. */
   bodyLimit?: number;
+  /** Defaults from config.ts when omitted. */
+  timeouts?: ServerTimeouts;
 }
 
 /**
@@ -37,6 +41,7 @@ export function buildApp({
   logStream,
   metrics = createMetrics(),
   bodyLimit = 5 * 1024 * 1024,
+  timeouts = ServerTimeouts.parse({}),
 }: AppOptions): FastifyInstance {
   const app = Fastify({
     logger: logger && {
@@ -44,6 +49,7 @@ export function buildApp({
       ...(logStream && { stream: logStream }),
     },
     bodyLimit,
+    ...serverTimeouts(timeouts),
     genReqId: (request) => {
       const inbound = request.headers[REQUEST_ID_HEADER];
       return isRequestId(inbound) ? inbound : randomUUID();
@@ -54,8 +60,13 @@ export function buildApp({
     done();
   });
   observeRequests(app, metrics);
+  useProblemHandlers(app, 'No such route. The mock pipeline serves POST /v1/logs.');
 
+  // Liveness: the process is up. Readiness: it can take a batch. Fastify
+  // answers 503 by itself once close() starts, so a draining instance drops
+  // out of rotation. TODO(BE-1): also check Postgres once PostgresEventStore lands.
   app.get('/healthz', () => ({ status: 'ok' }));
+  app.get('/readyz', () => ({ status: 'ok' }));
 
   app.post(OTLP_LOGS_PATH, async (request, reply) => {
     const deviceId = authenticate(request.headers.authorization);
@@ -113,9 +124,10 @@ function authenticate(header: string | undefined): string | null {
   return `dev_${createHash('sha256').update(token).digest('hex').slice(0, 16)}`;
 }
 
-function problem(reply: FastifyReply, status: number, detail: string) {
-  return reply
-    .status(status)
-    .type('application/problem+json')
-    .send({ status, detail, requestId: reply.request.id });
+function serverTimeouts(timeouts: ServerTimeouts) {
+  return {
+    requestTimeout: timeouts.requestTimeoutMs,
+    connectionTimeout: timeouts.connectionTimeoutMs,
+    keepAliveTimeout: timeouts.keepAliveTimeoutMs,
+  };
 }

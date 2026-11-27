@@ -12,6 +12,8 @@
     "job": "tsx --env-file-if-exists=../../.env --conditions=@fwcoach/source src/jobs/cli.ts"
   },
   "dependencies": {
+    "@fastify/helmet": "13.2.0",
+    "@fastify/rate-limit": "11.2.2",
     "@fwcoach/contracts": "workspace:*",
     "fastify": "5.12.8",
     "pg": "8.23.1",
@@ -19,8 +21,8 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@types/pg": "8.23.1",
-    "@fwcoach/testkit": "workspace:*"
+    "@fwcoach/testkit": "workspace:*",
+    "@types/pg": "8.23.1"
   },
   "files": [
     "dist"

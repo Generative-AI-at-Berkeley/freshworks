@@ -23,6 +23,27 @@ describe.runIf(url)('database', () => {
     expect(rows[0]).toEqual({ rolsuper: false, rolbypassrls: false });
   });
 
+  it('sets the server-side timeouts on every connection', async () => {
+    const { rows } = await pool.query<{ statement: string; idle: string }>(
+      "select current_setting('statement_timeout') as statement, current_setting('idle_in_transaction_session_timeout') as idle",
+    );
+    expect(rows[0]).toEqual({ statement: '15s', idle: '15s' });
+  });
+
+  it('cancels a statement that runs past the timeout', async () => {
+    const short = createPool(url ?? '', {
+      connectionTimeoutMs: 5000,
+      idleTimeoutMs: 1000,
+      statementTimeoutMs: 100,
+      idleInTransactionTimeoutMs: 1000,
+    });
+    try {
+      await expect(short.query('select pg_sleep(1)')).rejects.toThrow(/statement timeout/);
+    } finally {
+      await short.end();
+    }
+  });
+
   it('scopes the caller to one transaction', async () => {
     const principal = { engineerId: 'E1', roles: ['engineer' as const] };
     const inside = await withCaller(pool, principal, async (client) => {

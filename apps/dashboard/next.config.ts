@@ -15,6 +15,24 @@ const nextConfig: NextConfig = {
   // `next start` still works, with a warning.
   output: 'standalone',
   outputFileTracingRoot: fileURLToPath(new URL('../..', import.meta.url)),
+  // The CSP needs a per-request nonce, so src/proxy.ts sets it. These are the
+  // same on every response, API routes included.
+  headers() {
+    return Promise.resolve([{ source: '/:path*', headers: SECURITY_HEADERS }]);
+  },
 };
+
+const SECURITY_HEADERS = [
+  // Browsers ignore HSTS over plain http, so local runs are unaffected.
+  { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+  { key: 'X-Content-Type-Options', value: 'nosniff' },
+  // CSP frame-ancestors covers modern browsers. This covers the rest.
+  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
+  },
+];
 
 export default nextConfig;

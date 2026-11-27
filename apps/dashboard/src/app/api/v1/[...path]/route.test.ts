@@ -87,4 +87,31 @@ describe('API proxy', () => {
     expect(body.detail).toContain('Could not reach the API');
     expect(body.requestId).toBe(response.headers.get('x-request-id'));
   });
+
+  it('answers 504 when the API does not answer in time', async () => {
+    vi.stubEnv('API_BASE_URL', 'http://api.test');
+    vi.stubEnv('DASHBOARD_DEV_ENGINEER', 'e-100');
+    vi.stubEnv('DASHBOARD_DEV_ORG_UNIT', 'org-eng');
+    vi.stubEnv('API_TIMEOUT_MS', '20');
+    // Never answers on its own. Only the proxy's abort signal ends it.
+    vi.stubGlobal(
+      'fetch',
+      (_url: string, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener('abort', () => {
+            reject(init.signal?.reason as Error);
+          });
+        }),
+    );
+    const response = await call(['skills', 'adoption']);
+    expect(response.status).toBe(504);
+    expect(response.headers.get('content-type')).toBe('application/problem+json');
+    expect(await response.json()).toMatchObject({
+      type: 'about:blank',
+      title: 'Gateway Timeout',
+      status: 504,
+      detail: expect.stringContaining('API_TIMEOUT_MS') as unknown,
+      requestId: response.headers.get('x-request-id'),
+    });
+  });
 });

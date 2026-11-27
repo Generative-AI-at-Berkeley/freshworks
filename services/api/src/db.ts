@@ -1,14 +1,28 @@
 import pg from 'pg';
 
 import type { Principal } from './auth/principal.js';
+import { DbTimeouts } from './config.js';
 
 /**
  * One pool per process, connected as the service user (never the table
  * owner, which bypasses row-level security). Queries are parameterised
  * `client.query(text, values)` only. Never build SQL from request input.
  */
-export function createPool(databaseUrl: string): pg.Pool {
-  return new pg.Pool({ connectionString: databaseUrl, max: 10 });
+export function createPool(
+  databaseUrl: string,
+  timeouts: DbTimeouts = DbTimeouts.parse({}),
+): pg.Pool {
+  return new pg.Pool({
+    connectionString: databaseUrl,
+    max: 10,
+    connectionTimeoutMillis: timeouts.connectionTimeoutMs,
+    idleTimeoutMillis: timeouts.idleTimeoutMs,
+    // Sent as startup parameters, so every pooled connection has them without
+    // a SET on each checkout. A leaked transaction holds row locks and a pool
+    // slot; Postgres ends it instead of waiting for us.
+    statement_timeout: timeouts.statementTimeoutMs,
+    idle_in_transaction_session_timeout: timeouts.idleInTransactionTimeoutMs,
+  });
 }
 
 /**

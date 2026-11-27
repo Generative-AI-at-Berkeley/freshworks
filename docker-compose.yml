@@ -57,7 +57,7 @@ services:
           'CMD',
           'node',
           '-e',
-          "fetch('http://localhost:4318/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+          "fetch('http://localhost:4318/readyz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
         ]
       interval: 5s
       timeout: 3s
@@ -71,7 +71,8 @@ services:
     environment:
       API_PORT: '8080'
       # Header auth for the local demo. Ports bind to 127.0.0.1 only, so
-      # nobody else on your network can reach it.
+      # nobody else on your network can reach it. Not production: the API
+      # refuses header auth there even with API_ALLOW_HEADER_AUTH.
       NODE_ENV: staging
       API_AUTH_MODE: local
       API_ALLOW_HEADER_AUTH: 'true'

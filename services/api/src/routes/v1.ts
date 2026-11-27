@@ -1,7 +1,9 @@
-import type { FastifyInstance, FastifyReply } from 'fastify';
+import rateLimit from '@fastify/rate-limit';
+import type { FastifyInstance } from 'fastify';
 
 import { resolvePrincipal, type Principal } from '../auth/principal.js';
-import type { ApiConfig } from '../config.js';
+import type { ApiConfig, HttpLimits } from '../config.js';
+import { problem } from '../problem.js';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -34,8 +36,8 @@ const routes = [
  * looked like. Never gate auth on `request.url` string checks: the router
  * decodes paths, the string check does not.
  */
-export function v1(config: Pick<ApiConfig, 'authMode'>) {
-  return function plugin(app: FastifyInstance): Promise<void> {
+export function v1(config: Pick<ApiConfig, 'authMode'> & { limits: HttpLimits }) {
+  return async function plugin(app: FastifyInstance): Promise<void> {
     app.decorateRequest('principal');
     app.addHook('onRequest', async (request, reply) => {
       const principal = resolvePrincipal(config.authMode, request);
@@ -46,17 +48,17 @@ export function v1(config: Pick<ApiConfig, 'authMode'>) {
       request.principal = principal;
     });
 
+    // Per caller, not per IP: every browser reaches the API through the
+    // dashboard's server, so they all share one address. Registered after the
+    // auth hook, so the key is always a resolved principal.
+    await app.register(rateLimit, {
+      max: config.limits.rateLimitMax,
+      timeWindow: config.limits.rateLimitWindowMs,
+      keyGenerator: (request) => request.principal.engineerId,
+    });
+
     for (const { url, ticket } of routes) {
       app.get(url, (_request, reply) => problem(reply, 501, `Not implemented (${ticket}).`));
     }
-    return Promise.resolve();
   };
-}
-
-/** `requestId` matches the X-Request-ID header and the log line, so a reported error can be found. */
-export function problem(reply: FastifyReply, status: number, detail: string) {
-  return reply
-    .status(status)
-    .type('application/problem+json')
-    .send({ status, detail, requestId: reply.request.id });
 }

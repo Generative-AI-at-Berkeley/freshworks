@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 
 import { ServerMode } from '@/config/enums';
 import { ConfigError, loadServerConfig } from '@/config/server';
+import { problemResponse as problem } from '@/lib/problem-response';
 import { mockResponseFor } from '@/mock/routes';
 
 /**
@@ -13,15 +14,6 @@ import { mockResponseFor } from '@/mock/routes';
  * be anyone. That includes X-Request-ID: the proxy mints its own per call,
  * so the ID in an API log line always came from this server.
  */
-
-const problem = (status: number, detail: string, requestId: string) =>
-  NextResponse.json(
-    { status, detail, requestId },
-    {
-      status,
-      headers: { 'content-type': 'application/problem+json', [REQUEST_ID_HEADER]: requestId },
-    },
-  );
 
 /**
  * Next decodes the segments, so `%2F` or `..` arrive as plain text. Refuse
@@ -66,7 +58,11 @@ export async function GET(request: Request, context: Context): Promise<Response>
   if (config.devRoles) headers.set('x-dev-roles', config.devRoles);
 
   try {
-    const upstream = await fetch(target, { headers, cache: 'no-store' });
+    const upstream = await fetch(target, {
+      headers,
+      cache: 'no-store',
+      signal: AbortSignal.timeout(config.apiTimeoutMs),
+    });
     return new NextResponse(upstream.body, {
       status: upstream.status,
       headers: {
@@ -74,7 +70,14 @@ export async function GET(request: Request, context: Context): Promise<Response>
         [REQUEST_ID_HEADER]: requestId,
       },
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'TimeoutError') {
+      return problem(
+        504,
+        `The API at ${config.apiBaseUrl} did not answer within ${config.apiTimeoutMs} ms. Check its health with /readyz, or raise API_TIMEOUT_MS.`,
+        requestId,
+      );
+    }
     return problem(
       502,
       `Could not reach the API at ${config.apiBaseUrl}. Start it with pnpm dev:api, or check API_BASE_URL.`,

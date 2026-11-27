@@ -2,6 +2,7 @@ import type pg from 'pg';
 import { describe, expect, it } from 'vitest';
 
 import { buildApp } from './app.js';
+import { HttpLimits } from './config.js';
 import { buildMetricsApp, createMetrics } from './metrics.js';
 
 const pool = (ok: boolean) =>
@@ -38,6 +39,110 @@ describe('api', () => {
     const app = buildApp({ pool: pool(true), authMode: 'local', logger: false });
     const res = await app.inject({ url: '/v1/fleet/health', headers: { 'x-dev-engineer': 'E1' } });
     expect(res.statusCode).toBe(501);
+  });
+
+  it('answers an unknown route with a 404 problem', async () => {
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false });
+    const res = await app.inject('/nope');
+    expect(res.statusCode).toBe(404);
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(res.json()).toMatchObject({
+      type: 'about:blank',
+      title: 'Not Found',
+      status: 404,
+      requestId: res.headers['x-request-id'],
+    });
+  });
+
+  it('hides the message of an unexpected error', async () => {
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false });
+    app.get('/boom', () => {
+      throw new Error('relation "secret_table" does not exist');
+    });
+    const res = await app.inject('/boom');
+    expect(res.statusCode).toBe(500);
+    expect(res.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(res.body).not.toContain('secret_table');
+    expect(res.body).not.toContain('at ');
+    expect(res.json()).toMatchObject({
+      status: 500,
+      title: 'Internal Server Error',
+      requestId: res.headers['x-request-id'],
+    });
+  });
+
+  it('refuses a body over the limit with a 413 problem', async () => {
+    const limits = HttpLimits.parse({ bodyLimitBytes: 10 });
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false, limits });
+    app.post('/echo', () => ({}));
+    const res = await app.inject({
+      method: 'POST',
+      url: '/echo',
+      payload: { pad: 'x'.repeat(50) },
+    });
+    expect(res.statusCode).toBe(413);
+    expect(res.json()).toMatchObject({
+      status: 413,
+      title: 'Content Too Large',
+      requestId: res.headers['x-request-id'],
+    });
+  });
+
+  it('sends security headers and no CORS headers', async () => {
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false });
+    const res = await app.inject({ url: '/healthz', headers: { origin: 'https://evil.test' } });
+    expect(res.headers).toMatchObject({
+      'x-content-type-options': 'nosniff',
+      'x-frame-options': 'DENY',
+      'referrer-policy': 'no-referrer',
+    });
+    expect(res.headers['strict-transport-security']).toBeUndefined();
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
+    const preflight = await app.inject({
+      method: 'OPTIONS',
+      url: '/v1/me/data',
+      headers: { origin: 'https://evil.test', 'access-control-request-method': 'GET' },
+    });
+    expect(preflight.headers['access-control-allow-origin']).toBeUndefined();
+  });
+
+  it('sends HSTS when configured to', async () => {
+    const limits = HttpLimits.parse({ hsts: 'true' });
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false, limits });
+    const res = await app.inject('/healthz');
+    expect(res.headers['strict-transport-security']).toContain('max-age=31536000');
+  });
+
+  it('rate limits each caller separately', async () => {
+    const limits = HttpLimits.parse({ rateLimitMax: 2 });
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false, limits });
+    const as = (engineer: string) =>
+      app.inject({ url: '/v1/fleet/health', headers: { 'x-dev-engineer': engineer } });
+
+    expect((await as('E1')).statusCode).toBe(501);
+    expect((await as('E1')).statusCode).toBe(501);
+    const limited = await as('E1');
+    expect(limited.statusCode).toBe(429);
+    expect(limited.headers['retry-after']).toBeDefined();
+    expect(limited.headers['content-type']).toMatch(/^application\/problem\+json/);
+    expect(limited.json()).toMatchObject({
+      status: 429,
+      title: 'Too Many Requests',
+      requestId: limited.headers['x-request-id'],
+    });
+    expect((await as('E2')).statusCode).toBe(501);
+  });
+
+  it('sets server timeouts from config', () => {
+    const limits = HttpLimits.parse({
+      requestTimeoutMs: 1000,
+      connectionTimeoutMs: 2000,
+      keepAliveTimeoutMs: 3000,
+    });
+    const app = buildApp({ pool: pool(true), authMode: 'local', logger: false, limits });
+    expect(app.server.requestTimeout).toBe(1000);
+    expect(app.server.timeout).toBe(2000);
+    expect(app.server.keepAliveTimeout).toBe(3000);
   });
 });
 
