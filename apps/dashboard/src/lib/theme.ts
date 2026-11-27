@@ -7,12 +7,12 @@ import { readLocalStorage, writeLocalStorage } from '@/lib/local-store';
  * source of truth. A stored value is an explicit choice. No stored value means
  * follow the system.
  */
-export function readStoredTheme(): Theme | null {
+function readStoredTheme(): Theme | null {
   const stored = readLocalStorage(STORAGE_KEYS.theme);
   return stored === Theme.Dark || stored === Theme.Light ? stored : null;
 }
 
-export function systemTheme(): Theme {
+function systemTheme(): Theme {
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? Theme.Dark : Theme.Light;
 }
 

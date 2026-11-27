@@ -13,8 +13,8 @@ import { afterAll, describe, expect, it } from 'vitest';
  * BE-1 lands PostgresEventStore, so those checks switch on by themselves
  * once `app.ingest_msg` and `app.event` exist.
  */
-const ingestUrl = process.env.INGEST_URL ?? 'http://localhost:4318';
-const dbUrl = process.env.APP_DATABASE_URL;
+const ingestUrl = process.env['INGEST_URL'] ?? 'http://localhost:4318';
+const dbUrl = process.env['APP_DATABASE_URL'];
 
 const require = createRequire(import.meta.url);
 const event = TelemetryEvent.parse(

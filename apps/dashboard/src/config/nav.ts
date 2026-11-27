@@ -7,7 +7,7 @@ import { ROUTES } from '@/config/constants';
  * skills catching on, how do my teams and tools compare, and is the practice
  * healthy. The first item is the landing route.
  */
-export interface NavItem {
+interface NavItem {
   label: string;
   href: string;
   icon: IconName;
@@ -106,7 +106,7 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   },
 ];
 
-export const NAV_ITEMS: readonly NavItem[] = NAV_GROUPS.flatMap((group) => group.items);
+const NAV_ITEMS: readonly NavItem[] = NAV_GROUPS.flatMap((group) => group.items);
 
 /** Where "/" sends someone. Always the first nav entry. */
 export const LANDING_ROUTE = NAV_ITEMS[0]?.href ?? ROUTES.skills;

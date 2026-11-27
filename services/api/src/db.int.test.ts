@@ -3,7 +3,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { createPool, withCaller } from './db.js';
 
 // CI's db job runs these against a freshly migrated database, as the service user.
-const url = process.env.APP_DATABASE_URL;
+const url = process.env['APP_DATABASE_URL'];
 
 describe.runIf(url)('database', () => {
   const pool = createPool(url ?? '');

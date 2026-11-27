@@ -1,0 +1,29 @@
+{
+  "name": "fwcoach",
+  // Node 24 to match .nvmrc. postCreateCommand fails if the two drift.
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-24-bookworm",
+  "features": {
+    // Postgres runs from docker-compose.yml, so `pnpm dev:infra` and
+    // `pnpm demo` work inside the container.
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "postCreateCommand": "node -v | grep -q \"^v$(cat .nvmrc)\\.\" && corepack enable && corepack install && pnpm install",
+  "forwardPorts": [3000, 4318, 5432, 8080],
+  "portsAttributes": {
+    "3000": { "label": "dashboard" },
+    "4318": { "label": "ingest-mock" },
+    "5432": { "label": "postgres" },
+    "8080": { "label": "query API" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "vitest.explorer",
+        "ms-playwright.playwright",
+        "EditorConfig.EditorConfig"
+      ]
+    }
+  }
+}

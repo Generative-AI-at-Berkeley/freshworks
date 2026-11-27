@@ -1,0 +1,1691 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "fwcoach query API",
+    "version": "0.0.0",
+    "description": "Generated from packages/contracts/src/api by `pnpm gen:openapi`. Do not edit by hand. Conventions and auth are in docs/api.md."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local API (`pnpm dev:api`)."
+    }
+  ],
+  "security": [
+    {
+      "oidc": []
+    },
+    {
+      "devHeaders": []
+    }
+  ],
+  "paths": {
+    "/v1/me/data": {
+      "get": {
+        "summary": "Anyone, for themselves. Includes the raw rows behind their numbers.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-2 owns the final one. Returns 501 until BE-2 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-2",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The nextCursor from the previous page.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "explain",
+            "in": "query",
+            "required": false,
+            "description": "Adds the price_book rows used and the usage each one priced.",
+            "schema": {
+              "type": "string",
+              "enum": ["true"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyData"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/org/{orgUnitId}/overview": {
+      "get": {
+        "summary": "Managers of that unit, admins.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-3 owns the final one. Returns 501 until BE-3 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-3",
+        "parameters": [
+          {
+            "name": "orgUnitId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "explain",
+            "in": "query",
+            "required": false,
+            "description": "Adds the price_book rows used and the usage each one priced.",
+            "schema": {
+              "type": "string",
+              "enum": ["true"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgOverview"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/leaders/{managerId}/rollup": {
+      "get": {
+        "summary": "That manager and their chain, admins.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-3 owns the final one. Returns 501 until BE-3 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-3",
+        "parameters": [
+          {
+            "name": "managerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "description": "Levels of the reporting tree to roll up.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            }
+          },
+          {
+            "name": "explain",
+            "in": "query",
+            "required": false,
+            "description": "Adds the price_book rows used and the usage each one priced.",
+            "schema": {
+              "type": "string",
+              "enum": ["true"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderRollup"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/engineers/{engineerId}": {
+      "get": {
+        "summary": "The engineer, their chain as of the date, admins. Writes access_log.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-2 owns the final one. Returns 501 until BE-2 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-2",
+        "parameters": [
+          {
+            "name": "engineerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineerDetail"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/admin/access-log": {
+      "get": {
+        "summary": "Admins.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-2 owns the final one. Returns 501 until BE-2 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-2",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "subject",
+            "in": "query",
+            "required": false,
+            "description": "Only views of this engineer.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "The nextCursor from the previous page.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessLog"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/skills/adoption": {
+      "get": {
+        "summary": "Managers (scoped to subtree), admins.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-3 owns the final one. Returns 501 until BE-3 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-3",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkillAdoption"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/fleet/health": {
+      "get": {
+        "summary": "Admins.",
+        "description": "Draft. The response shape is the dashboard's proposal and BE-4 owns the final one. Returns 501 until BE-4 lands.",
+        "x-status": "draft",
+        "x-ticket": "BE-4",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "First UTC day of the range, inclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "UTC day the range ends, exclusive.",
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FleetHealth"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Liveness.",
+        "description": "Implemented.",
+        "x-status": "done",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. `detail` says what broke and what to do.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "summary": "Readiness, including Postgres. 503 when Postgres is unreachable.",
+        "description": "Implemented.",
+        "x-status": "done",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "ok"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Postgres is unreachable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "const": "unavailable"
+                    }
+                  },
+                  "required": ["status"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "oidc": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Bearer token from the corporate IdP. `sub` maps to engineer.sso_subject. Not implemented yet (BE-2)."
+      },
+      "devHeaders": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Dev-Engineer",
+        "description": "Local mode only: an employee id, with optional `X-Dev-Roles: platform_admin`. Refused unless NODE_ENV is development or test, or API_ALLOW_HEADER_AUTH=true."
+      }
+    },
+    "schemas": {
+      "AccessLog": {
+        "type": "object",
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccessLogEntry"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "nextCursor": {
+            "type": ["string", "null"]
+          }
+        },
+        "required": ["range", "entries", "total", "nextCursor"],
+        "additionalProperties": false
+      },
+      "AccessLogEntry": {
+        "type": "object",
+        "properties": {
+          "viewedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "viewer": {
+            "$ref": "#/components/schemas/PersonRef"
+          },
+          "subject": {
+            "$ref": "#/components/schemas/PersonRef"
+          },
+          "route": {
+            "type": "string"
+          }
+        },
+        "required": ["viewedAt", "viewer", "subject", "route"],
+        "additionalProperties": false
+      },
+      "AdoptionTotals": {
+        "type": "object",
+        "properties": {
+          "engineersInScope": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "engineersWithSkills": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "engineersUsingSkills": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "engineersUsingLast7Days": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "trend": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "$ref": "#/components/schemas/Day"
+                },
+                "engineersUsingSkills": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["day", "engineersUsingSkills"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "engineersInScope",
+          "engineersWithSkills",
+          "engineersUsingSkills",
+          "engineersUsingLast7Days",
+          "trend"
+        ],
+        "additionalProperties": false
+      },
+      "Cost": {
+        "type": "object",
+        "properties": {
+          "costUsd": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "costCoverage": {
+            "$ref": "#/components/schemas/Coverage"
+          }
+        },
+        "required": ["costUsd", "costCoverage"],
+        "additionalProperties": false
+      },
+      "Coverage": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1
+      },
+      "Day": {
+        "type": "string",
+        "format": "date",
+        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+      },
+      "Distribution": {
+        "type": "object",
+        "properties": {
+          "p50": {
+            "type": ["number", "null"]
+          },
+          "p90": {
+            "type": ["number", "null"]
+          },
+          "buckets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "number"
+                },
+                "to": {
+                  "type": "number"
+                },
+                "engineers": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["from", "to", "engineers"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["p50", "p90", "buckets"],
+        "additionalProperties": false
+      },
+      "EngineerDetail": {
+        "type": "object",
+        "properties": {
+          "engineer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "orgUnit": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "name"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["id", "name", "orgUnit"],
+            "additionalProperties": false
+          },
+          "chain": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonRef"
+            }
+          },
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "harnesses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "harness": {
+                  "type": "string",
+                  "enum": ["claude-code", "cursor", "cursor-agent", "kiro"]
+                },
+                "activeDays": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["harness", "activeDays"],
+              "additionalProperties": false
+            }
+          },
+          "skillsInstalled": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "skillId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "invocations": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["skillId", "name", "invocations"],
+              "additionalProperties": false
+            }
+          },
+          "suggestedSkills": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "skillId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "departmentActiveShare": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["skillId", "name", "departmentActiveShare"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "engineer",
+          "chain",
+          "range",
+          "harnesses",
+          "skillsInstalled",
+          "suggestedSkills"
+        ],
+        "additionalProperties": false
+      },
+      "FleetHealth": {
+        "type": "object",
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "dataThrough": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Day"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "devices": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "reportingLastDay": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "quiet": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": ["total", "reportingLastDay", "quiet"],
+            "additionalProperties": false
+          },
+          "agentVersions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "version": {
+                  "type": "string"
+                },
+                "devices": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["version", "devices"],
+              "additionalProperties": false
+            }
+          },
+          "uploads": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "$ref": "#/components/schemas/Day"
+                },
+                "batches": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "accepted": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "duplicates": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "rejected": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["day", "batches", "accepted", "duplicates", "rejected"],
+              "additionalProperties": false
+            }
+          },
+          "rejections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "reason": {
+                  "$ref": "#/components/schemas/RejectionReason"
+                },
+                "count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["reason", "count"],
+              "additionalProperties": false
+            }
+          },
+          "harnesses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "harness": {
+                  "type": "string",
+                  "enum": ["claude-code", "cursor", "cursor-agent", "kiro"]
+                },
+                "devices": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["harness", "devices"],
+              "additionalProperties": false
+            }
+          },
+          "quietDevices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "deviceId": {
+                  "type": "string"
+                },
+                "owner": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["id", "name"],
+                  "additionalProperties": false
+                },
+                "agentVersion": {
+                  "type": ["string", "null"]
+                },
+                "lastSeenAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": ["deviceId", "owner", "agentVersion", "lastSeenAt"],
+              "additionalProperties": false
+            }
+          },
+          "lastRetentionRun": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "ranAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                  },
+                  "dryRun": {
+                    "type": "boolean"
+                  },
+                  "partitionsDropped": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  },
+                  "rowsPurged": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                },
+                "required": ["ranAt", "dryRun", "partitionsDropped", "rowsPurged"],
+                "additionalProperties": false
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "range",
+          "dataThrough",
+          "devices",
+          "agentVersions",
+          "uploads",
+          "rejections",
+          "harnesses",
+          "quietDevices",
+          "lastRetentionRun"
+        ],
+        "additionalProperties": false
+      },
+      "HarnessUsage": {
+        "type": "object",
+        "properties": {
+          "harness": {
+            "type": "string",
+            "enum": ["claude-code", "cursor", "cursor-agent", "kiro"]
+          },
+          "activeEngineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "sessions": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/Measured"
+          },
+          "tokenCoverage": {
+            "$ref": "#/components/schemas/Coverage"
+          },
+          "credits": {
+            "$ref": "#/components/schemas/Measured"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/Cost"
+          }
+        },
+        "required": [
+          "harness",
+          "activeEngineers",
+          "sessions",
+          "tokens",
+          "tokenCoverage",
+          "credits",
+          "cost"
+        ],
+        "additionalProperties": false
+      },
+      "LeaderRollup": {
+        "type": "object",
+        "properties": {
+          "manager": {
+            "$ref": "#/components/schemas/PersonRef"
+          },
+          "chain": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PersonRef"
+            }
+          },
+          "depth": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "dataThrough": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Day"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "type": "object",
+            "properties": {
+              "engineers": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "activeEngineers": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "sessions": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "cost": {
+                "$ref": "#/components/schemas/Cost"
+              },
+              "subagentShare": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/Coverage"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": ["engineers", "activeEngineers", "sessions", "cost", "subagentShare"],
+            "additionalProperties": false
+          },
+          "teams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamRollup"
+            }
+          },
+          "directReports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReportSummary"
+            }
+          }
+        },
+        "required": [
+          "manager",
+          "chain",
+          "depth",
+          "range",
+          "dataThrough",
+          "total",
+          "teams",
+          "directReports"
+        ],
+        "additionalProperties": false
+      },
+      "Measured": {
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "MyData": {
+        "type": "object",
+        "properties": {
+          "engineer": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "orgUnit": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": ["id", "name"],
+                "additionalProperties": false
+              }
+            },
+            "required": ["id", "name", "orgUnit"],
+            "additionalProperties": false
+          },
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "dataThrough": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Day"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "devices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "deviceId": {
+                  "type": "string"
+                },
+                "agentVersion": {
+                  "type": ["string", "null"]
+                },
+                "firstSeenAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                },
+                "lastSeenAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                }
+              },
+              "required": ["deviceId", "agentVersion", "firstSeenAt", "lastSeenAt"],
+              "additionalProperties": false
+            }
+          },
+          "harnesses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "harness": {
+                  "type": "string",
+                  "enum": ["claude-code", "cursor", "cursor-agent", "kiro"]
+                },
+                "activeDays": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "sessions": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "tokens": {
+                  "$ref": "#/components/schemas/Measured"
+                },
+                "credits": {
+                  "$ref": "#/components/schemas/Measured"
+                },
+                "cost": {
+                  "$ref": "#/components/schemas/Cost"
+                }
+              },
+              "required": ["harness", "activeDays", "sessions", "tokens", "credits", "cost"],
+              "additionalProperties": false
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MyEvent"
+            }
+          },
+          "totalEvents": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "nextCursor": {
+            "type": ["string", "null"]
+          },
+          "retentionMonths": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "engineer",
+          "range",
+          "dataThrough",
+          "devices",
+          "harnesses",
+          "events",
+          "totalEvents",
+          "nextCursor",
+          "retentionMonths"
+        ],
+        "additionalProperties": false
+      },
+      "MyEvent": {
+        "type": "object",
+        "properties": {
+          "occurredAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "harness": {
+            "type": "string",
+            "enum": ["claude-code", "cursor", "cursor-agent", "kiro"]
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": ["string", "null"]
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["occurredAt", "harness", "eventType", "sessionId", "fields"],
+        "additionalProperties": false
+      },
+      "OrgOverview": {
+        "type": "object",
+        "properties": {
+          "orgUnit": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "name"],
+            "additionalProperties": false
+          },
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "dataThrough": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Day"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "engineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "activeEngineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "harnesses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HarnessUsage"
+            }
+          },
+          "cost": {
+            "$ref": "#/components/schemas/Cost"
+          },
+          "sessionsPerEngineer": {
+            "$ref": "#/components/schemas/Distribution"
+          },
+          "subagentShare": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coverage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "orgUnit",
+          "range",
+          "dataThrough",
+          "engineers",
+          "activeEngineers",
+          "harnesses",
+          "cost",
+          "sessionsPerEngineer",
+          "subagentShare"
+        ],
+        "additionalProperties": false
+      },
+      "PersonRef": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name"],
+        "additionalProperties": false
+      },
+      "Problem": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "required": ["status", "detail"],
+        "additionalProperties": {}
+      },
+      "Range": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "$ref": "#/components/schemas/Day"
+          },
+          "to": {
+            "$ref": "#/components/schemas/Day"
+          }
+        },
+        "required": ["from", "to"],
+        "additionalProperties": false
+      },
+      "RejectionReason": {
+        "type": "string",
+        "enum": ["invalid_schema", "not_base64", "too_large"]
+      },
+      "ReportSummary": {
+        "type": "object",
+        "properties": {
+          "engineerId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "harnesses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "skillsInstalled": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "skillsNeverUsed": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": ["engineerId", "name", "harnesses", "skillsInstalled", "skillsNeverUsed"],
+        "additionalProperties": false
+      },
+      "SkillAdoption": {
+        "type": "object",
+        "properties": {
+          "range": {
+            "$ref": "#/components/schemas/Range"
+          },
+          "dataThrough": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Day"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "totals": {
+            "$ref": "#/components/schemas/AdoptionTotals"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillAdoptionRow"
+            }
+          }
+        },
+        "required": ["range", "dataThrough", "totals", "skills"],
+        "additionalProperties": false
+      },
+      "SkillAdoptionRow": {
+        "type": "object",
+        "properties": {
+          "skillId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "harness": {
+            "type": "string",
+            "enum": ["claude-code", "cursor", "cursor-agent", "kiro"]
+          },
+          "installedEngineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "activeEngineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "invocations": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "medianDaysToFirstUse": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trend": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "$ref": "#/components/schemas/Day"
+                },
+                "activeEngineers": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["day", "activeEngineers"],
+              "additionalProperties": false
+            }
+          },
+          "departments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "orgUnitId": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "activeEngineers": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": ["orgUnitId", "name", "activeEngineers"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "skillId",
+          "name",
+          "harness",
+          "installedEngineers",
+          "activeEngineers",
+          "invocations",
+          "medianDaysToFirstUse",
+          "trend",
+          "departments"
+        ],
+        "additionalProperties": false
+      },
+      "TeamRollup": {
+        "type": "object",
+        "properties": {
+          "managerId": {
+            "type": "string"
+          },
+          "managerName": {
+            "type": "string"
+          },
+          "engineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "activeEngineers": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "sessions": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "cost": {
+            "$ref": "#/components/schemas/Cost"
+          },
+          "subagentShare": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coverage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "managerId",
+          "managerName",
+          "engineers",
+          "activeEngineers",
+          "sessions",
+          "cost",
+          "subagentShare"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

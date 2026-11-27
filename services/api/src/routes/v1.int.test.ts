@@ -7,7 +7,7 @@ import { buildApp } from '../app.js';
 import { createPool } from '../db.js';
 
 // CI's db job runs these against a freshly migrated database, as the service user.
-const url = process.env.APP_DATABASE_URL;
+const url = process.env['APP_DATABASE_URL'];
 
 /**
  * Every /v1 route and the schema in packages/contracts its 2xx body must

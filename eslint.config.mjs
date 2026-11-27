@@ -47,6 +47,8 @@ export default tseslint.config(
       // Unhandled promises are how a collector silently drops a batch.
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
+      // A new Harness or EventType must fail lint wherever a switch forgets it.
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
       // console output from the collector can end up in a user's terminal or a
       // launchd log. Use the logger so redaction and levels apply.
       'no-console': 'error',

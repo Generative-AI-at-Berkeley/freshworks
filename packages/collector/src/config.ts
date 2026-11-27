@@ -35,13 +35,13 @@ export type CollectorConfig = z.infer<typeof CollectorConfig>;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): CollectorConfig {
   const parsed = CollectorConfig.safeParse({
-    ingestUrl: env.FWCOACH_INGEST_URL,
-    stateDir: env.FWCOACH_STATE_DIR,
-    flushIntervalSeconds: env.FWCOACH_FLUSH_INTERVAL_SECONDS,
-    bufferMaxBytes: env.FWCOACH_BUFFER_MAX_BYTES,
-    contentLevel: env.FWCOACH_CONTENT_LEVEL,
-    logLevel: env.FWCOACH_LOG_LEVEL,
-    devToken: env.FWCOACH_DEV_TOKEN,
+    ingestUrl: env['FWCOACH_INGEST_URL'],
+    stateDir: env['FWCOACH_STATE_DIR'],
+    flushIntervalSeconds: env['FWCOACH_FLUSH_INTERVAL_SECONDS'],
+    bufferMaxBytes: env['FWCOACH_BUFFER_MAX_BYTES'],
+    contentLevel: env['FWCOACH_CONTENT_LEVEL'],
+    logLevel: env['FWCOACH_LOG_LEVEL'],
+    devToken: env['FWCOACH_DEV_TOKEN'],
   });
   if (!parsed.success) {
     throw new Error(

@@ -22,11 +22,11 @@ export function inheritedEnv(): NodeJS.ProcessEnv {
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): DemoConfig {
   const parsed = DemoConfig.safeParse({
-    postgresPort: env.POSTGRES_PORT,
-    ingestPort: env.INGEST_PORT,
-    apiPort: env.API_PORT,
-    dashboardPort: env.DASHBOARD_PORT,
-    seed: env.DEMO_SEED,
+    postgresPort: env['POSTGRES_PORT'],
+    ingestPort: env['INGEST_PORT'],
+    apiPort: env['API_PORT'],
+    dashboardPort: env['DASHBOARD_PORT'],
+    seed: env['DEMO_SEED'],
   });
   if (!parsed.success) {
     throw new Error(

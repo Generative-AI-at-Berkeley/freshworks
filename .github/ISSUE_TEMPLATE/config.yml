@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security issue
-    url: https://github.com/Generative-AI-at-Berkeley/freshworks/security/advisories/new
+    url: https://github.com/Generative-AI-at-Berkeley/fwcoach/security/advisories/new
     about: Report privately. Do not open a public issue for anything security related.

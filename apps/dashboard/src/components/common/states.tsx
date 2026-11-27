@@ -19,7 +19,7 @@ export function EmptyState({ title, description }: { title: string; description:
   );
 }
 
-export function LoadingBlock({ rows = 4 }: { rows?: number }) {
+function LoadingBlock({ rows = 4 }: { rows?: number }) {
   return (
     <div className={styles.loading} aria-busy="true" aria-label="Loading">
       {Array.from({ length: rows }, (_, index) => (

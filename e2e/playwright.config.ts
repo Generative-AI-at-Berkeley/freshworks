@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 // Off the dev port, so a running `pnpm dev:dashboard` is never mistaken for the build under test.
-const port = Number(process.env.SMOKE_PORT ?? 3100);
+const port = Number(process.env['SMOKE_PORT'] ?? 3100);
 
 /**
  * Dashboard smoke test in mock mode. Build first: `pnpm --filter
@@ -11,9 +11,9 @@ const port = Number(process.env.SMOKE_PORT ?? 3100);
 export default defineConfig({
   testDir: './dashboard',
   testMatch: '**/*.spec.ts',
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [['github'], ['list']] : 'list',
+  forbidOnly: !!process.env['CI'],
+  retries: process.env['CI'] ? 1 : 0,
+  reporter: process.env['CI'] ? [['github'], ['list']] : 'list',
   use: { baseURL: `http://localhost:${port}`, trace: 'retain-on-failure' },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
@@ -22,7 +22,7 @@ export default defineConfig({
   webServer: {
     command: `pnpm --filter @fwcoach/dashboard exec next start --port ${port}`,
     url: `http://localhost:${port}/api/session`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env['CI'],
     timeout: 60_000,
     // Blank API settings put the dashboard in mock mode (apps/dashboard/src/config/server.ts).
     env: { API_BASE_URL: '', DASHBOARD_DEV_ENGINEER: '', DASHBOARD_DEV_ORG_UNIT: '' },
