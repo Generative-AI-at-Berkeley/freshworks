@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { ServerMode } from '@/config/enums';
+import { PLATFORM_ADMIN_ROLE, ServerMode } from '@/config/enums';
 import { ConfigError, loadServerConfig } from '@/config/server';
 import type { Session } from '@/lib/session';
 import { MOCK_VIEWER } from '@/mock/org';
@@ -29,6 +29,10 @@ export function GET(): Response {
           // TODO(X-3): names come from /v1/me/data once BE-2 serves it.
           displayName: null,
           orgUnitName: null,
+          isAdmin: (config.devRoles ?? '')
+            .split(',')
+            .map((role) => role.trim())
+            .includes(PLATFORM_ADMIN_ROLE),
         };
   return NextResponse.json(session, { headers: { 'cache-control': 'no-store' } });
 }

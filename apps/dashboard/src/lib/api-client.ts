@@ -73,4 +73,13 @@ export const apiClient = {
     request(`/v1/leaders/${id(managerId)}/rollup${query({ depth, ...range })}`, api.LeaderRollup),
   engineer: (engineerId: string, range: DayRange) =>
     request(`/v1/engineers/${id(engineerId)}${query({ ...range })}`, api.EngineerDetail),
+  fleetHealth: (range: DayRange) =>
+    request(`/v1/fleet/health${query({ ...range })}`, api.FleetHealth),
+  accessLog: (range: DayRange, cursor: string | null) =>
+    request(
+      `/v1/admin/access-log${query({ ...range, ...(cursor ? { cursor } : {}) })}`,
+      api.AccessLog,
+    ),
+  myData: (range: DayRange, cursor: string | null) =>
+    request(`/v1/me/data${query({ ...range, ...(cursor ? { cursor } : {}) })}`, api.MyData),
 };

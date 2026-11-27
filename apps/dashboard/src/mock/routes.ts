@@ -1,5 +1,6 @@
 import type { DayRange } from '@/lib/range';
 import { lastDays } from '@/lib/range';
+import { accessLog, fleetHealth, myData } from '@/mock/admin';
 import { engineer, leaderRollup, orgOverview, skillAdoption } from '@/mock/responses';
 
 export type MockResult = { status: 200; body: unknown } | { status: 404; detail: string };
@@ -31,5 +32,11 @@ export function mockResponseFor(path: readonly string[], search: URLSearchParams
     return found(leaderRollup(id, depth, range));
   }
   if (resource === 'engineers' && id && path.length === 2) return found(engineer(id, range));
+  if (resource === 'fleet' && id === 'health' && path.length === 2)
+    return found(fleetHealth(range));
+  if (resource === 'admin' && id === 'access-log' && path.length === 2)
+    return found(accessLog(range, search.get('cursor'), search.get('subject')));
+  if (resource === 'me' && id === 'data' && path.length === 2)
+    return found(myData(range, search.get('cursor')));
   return notFound(`No mock data for /v1/${path.join('/')}. Add it in apps/dashboard/src/mock.`);
 }

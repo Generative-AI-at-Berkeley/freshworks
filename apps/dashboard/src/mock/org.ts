@@ -38,6 +38,8 @@ export const MOCK_VIEWER = {
   orgUnitId: 'org-eng',
   displayName: 'Avery Stone',
   orgUnitName: 'Engineering',
+  // An admin too, so mock mode shows every page.
+  isAdmin: true,
 } as const;
 
 export function person(id: string): MockPerson | undefined {

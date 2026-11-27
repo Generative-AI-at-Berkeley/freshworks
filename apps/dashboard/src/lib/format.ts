@@ -80,3 +80,17 @@ export function formatCountDelta(current: number, previous: number): string {
 export function formatDay(day: string): string {
   return shortDate.format(new Date(`${day}T00:00:00Z`));
 }
+
+const dateTime = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+  timeZone: 'UTC',
+});
+
+/** An instant as "Nov 26, 14:05 UTC". UTC so every viewer reads the same time. */
+export function formatDateTime(iso: string): string {
+  return `${dateTime.format(new Date(iso))} UTC`;
+}

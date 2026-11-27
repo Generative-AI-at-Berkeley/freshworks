@@ -8,6 +8,12 @@ export const ServerMode = {
 } as const;
 export type ServerMode = (typeof ServerMode)[keyof typeof ServerMode];
 
+/**
+ * The API's admin role, as `services/api/src/auth/principal.ts` names it. The
+ * dashboard only uses it to decide which pages to offer; the API enforces it.
+ */
+export const PLATFORM_ADMIN_ROLE = 'platform_admin';
+
 export const Theme = {
   Light: 'light',
   Dark: 'dark',
