@@ -6,8 +6,8 @@ tagged with its ID in `e2e/pipeline.e2e.test.ts`. Nobody owns "just the
 tests" or "just the schema". Every backend ticket writes the migrations for
 its own tables.
 
-The full ticket text, checklist and status live in the GitHub issues. This
-page is the map from ticket to code.
+The full design, acceptance criteria and quality bar for each ticket live in
+the GitHub issues. This page is the map from ticket to code.
 
 Find a ticket's stubs with `grep -rn "TODO(BE-2)" .` (or your ticket ID).
 
@@ -40,9 +40,12 @@ another's output, so agree the interface early, not wait for the code.
 
 ### BE-1 Ingestion pipeline ([#6](https://github.com/Generative-AI-at-Berkeley/fwcoach/issues/6))
 
-Raw events from the wire into Postgres: event partitions, `ingest_msg`
-dedupe, devices, batches, rate and burst limits, oversized events, the mock
-device registration and credential rotation, and the retention job.
+Raw events from the wire into Postgres, exactly once, proven by property
+tests: event partitions created ahead of time, `ingest_msg` dedupe, devices
+and hashed `device_credential` rows with a rotation overlap, batches, an
+`ingest_rejection` record for everything not stored, rate and burst limits,
+oversized events, and a retention job with a dry run and a `retention_run`
+audit row.
 
 - Code: `services/ingest-mock`, `db/migrations`, `services/api/src/jobs/retention.ts`
 - Done: replaying the same batch twice stores it once, and the limits are covered by tests.
@@ -50,9 +53,13 @@ device registration and credential rotation, and the retention job.
 ### BE-2 Identity, org and access ([#7](https://github.com/Generative-AI-at-Berkeley/fwcoach/issues/7))
 
 Who people are and who can see whom: engineer, org_unit, effective-dated
-manager_edge, the roster CSV loader, the synthetic org generator with a reorg,
-OIDC and local auth, row-level security, AccessPolicy, access_log, and the
-`/v1/me`, `/v1/engineers` and `/v1/admin/access-log` routes.
+manager_edge, the roster CSV loader, the synthetic org generator with a
+reorg, OIDC and local auth, and the `/v1/me`, `/v1/engineers` and
+`/v1/admin/access-log` routes. Access is one SQL function,
+`app.reports_to()`, used by row-level security and AccessPolicy, plus
+`app.protect()` for other tickets' tables. A differential test checks the SQL
+against a reference model on random org trees, and an authorization matrix
+tests every route as every role.
 
 - Code: `services/api/src/{auth,access,directory}`, `src/routes/v1.ts`, `packages/testkit/src/org.ts`
 - Done: a manager cannot see anyone outside their subtree, including after a reorg in the test data.
@@ -61,8 +68,10 @@ OIDC and local auth, row-level security, AccessPolicy, access_log, and the
 
 Turning raw events into answers: session_fact, request_rollup_daily,
 skill_usage_fact, the idempotent nightly job with subagent work inside the
-parent and broken out, and the `/v1/org`, `/v1/leaders` and
-`/v1/skills/adoption` routes. Skill adoption is the sponsor's headline view.
+parent and broken out, coverage on every total, `rollup_dirty_day` so late
+events repair their day, and the `/v1/org`, `/v1/leaders` and
+`/v1/skills/adoption` routes. A differential test checks the SQL against a
+reference fold. Skill adoption is the sponsor's headline view.
 
 - Code: `services/api/src/jobs/rollup-daily.ts`, `src/routes/v1.ts`
 - Done: rollups match the raw events, and re-running a day gives the same answer.
@@ -70,8 +79,9 @@ parent and broken out, and the `/v1/org`, `/v1/leaders` and
 ### BE-4 Cost model and fleet health ([#9](https://github.com/Generative-AI-at-Berkeley/fwcoach/issues/9))
 
 What it all costs and whether the fleet is healthy: price_book with a sourced
-default seed, the PriceBook for tokens, credits and self-hosted GPU time,
-recompute on price change, cost coverage on every cost total, and
+default seed, explicit `model_alias` matching, the PriceBook for tokens,
+credits and self-hosted GPU time, recompute on price change, cost coverage
+and `?explain=true` on every cost total, an invoice reconciliation test, and
 `/v1/fleet/health`.
 
 - Code: `services/api/src/pricing`, `db/seeds`, `src/routes/v1.ts`
@@ -83,8 +93,9 @@ recompute on price change, cost coverage on every cost total, and
 
 The daemon itself: DiskBuffer, HttpUploader, the Jamf credential flow,
 cursors, daemon_heartbeat and event_rejected, the content policy as a
-per-event allowlist, `--dry-run`, Jamf packaging, and the end-to-end runner
-with its synthetic day of traffic.
+per-event allowlist, `--dry-run` and `fwcoach show`, a resource budget, Jamf
+packaging, and the end-to-end runner with its synthetic day of traffic.
+Crash safety is proven by a chaos test that kills the collector mid-flush.
 
 - Code: `packages/collector/src/{buffer,upload,auth,policy}`, `src/daemon.ts`, `packages/testkit/src/traffic.ts`, `e2e/`
 - Done: it survives kill -9 mid-flush and the mock ingest shows no duplicates.
@@ -92,9 +103,10 @@ with its synthetic day of traffic.
 ### AG-2 Claude Code, normalizer and event schemas ([#11](https://github.com/Generative-AI-at-Berkeley/fwcoach/issues/11))
 
 The first harness and the shared contract: the Claude Code format doc and
-adapter (token usage from transcripts, subagent links, skill invocations),
-the normalizer every adapter uses, and the Zod schemas and fixtures for the
-session, tool, command and agent event types.
+adapter (token usage from transcripts, subagent links, skill invocations,
+format drift counters), the normalizer every adapter uses, the Zod schemas
+and fixtures for the session, tool, command and agent event types, and a
+committed JSON Schema export Freshworks can validate against.
 
 - Code: `packages/collector/src/adapters/claude-code`, `src/normalize`, `packages/contracts`, `docs/formats/claude-code.md`
 - Done: one real Claude Code session produces valid events that match the fixtures.
@@ -114,8 +126,8 @@ subagents, and the Cursor event schemas (`token_usage`, `pdlc_*`).
 The newest harness and everything about skills: the Kiro format doc (due
 Tue Dec 1) and adapter with credits and sub-executions, the SkillScanner
 across all harnesses (Claude skills, Cursor rules, Kiro steering and Powers),
-the CatalogProvider with a mock marketplace, and the field proposal to
-Freshworks.
+an offline `fwcoach skills` command for engineers, the CatalogProvider with
+a mock marketplace, and the field proposal to Freshworks.
 
 - Code: `packages/collector/src/adapters/kiro`, `src/skills`, `packages/contracts/src/proposed.ts`, `docs/formats/kiro.md`, `docs/contracts/proposed-fields.md`
 - Done: a Kiro session lands with credits and the parent and subagent link, and installed skills show up with invocation counts.

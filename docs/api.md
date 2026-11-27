@@ -39,6 +39,10 @@ Data reads go through `withCaller` in `src/db.ts`.
 - Dates are UTC days as `YYYY-MM-DD`. Ranges are `from` inclusive, `to` exclusive.
 - Every cost comes with its coverage: `{ "costUsd": 1234.5, "costCoverage": 0.82 }`.
   `costUsd` is `null` when nothing could be priced.
+- Any route that returns a cost accepts `?explain=true`, which adds the
+  `price_book` rows used and the usage each one priced. Line items sum to the total.
+- Every total carries its coverage: how much of the underlying data was
+  actually measured, so a gap never reads as zero.
 - No endpoint returns people ordered by volume. Distributions, not rankings.
 - Unknown is `null`, never `0`.
 
