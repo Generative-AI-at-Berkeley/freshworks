@@ -1,4 +1,4 @@
-# Local dev and the staging demo. Everything here is synthetic and local.
+# Local dev and the demo (pnpm demo). Everything here is synthetic and local.
 #   docker compose up -d --wait          whole stack
 #   docker compose up -d postgres        just the database (pnpm dev:infra)
 
@@ -88,6 +88,38 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+
+  # Off by default, so `docker compose up` (and CI's e2e job) is unchanged.
+  # Start it with --profile dashboard. pnpm demo sets the variables below.
+  dashboard:
+    profiles: [dashboard]
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    environment:
+      # Blank runs the dashboard on its built-in synthetic org (mock mode).
+      API_BASE_URL: ${DASHBOARD_API_BASE_URL:-}
+      DASHBOARD_DEV_ENGINEER: ${DASHBOARD_DEV_ENGINEER:-}
+      DASHBOARD_DEV_ORG_UNIT: ${DASHBOARD_DEV_ORG_UNIT:-}
+      DASHBOARD_DEV_ROLES: ${DASHBOARD_DEV_ROLES:-}
+      # Same reasoning as API_ALLOW_HEADER_AUTH above: localhost only.
+      DASHBOARD_ALLOW_DEV_IDENTITY: 'true'
+    ports:
+      - '127.0.0.1:${DASHBOARD_PORT:-3000}:3000'
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://localhost:3000/api/session').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
 volumes:
   pgdata:

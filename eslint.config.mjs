@@ -66,7 +66,7 @@ export default tseslint.config(
   {
     // Tests and e2e tooling may read the environment to decide whether and
     // where to run, as db.int.test.ts and the Playwright config do.
-    ignores: ['**/src/config.ts', 'apps/dashboard/src/config/server.ts', '**/*.test.ts', 'e2e/**'],
+    ignores: ['**/config.ts', 'apps/dashboard/src/config/server.ts', '**/*.test.ts', 'e2e/**'],
     rules: {
       'no-restricted-syntax': ['error', noProcessEnv],
       'no-restricted-imports': ['error', { paths: [noEnvImport] }],
