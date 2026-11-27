@@ -7,7 +7,7 @@
  * Lookups are triggered by a local signal (an unmatched prompt cluster, or an
  * installed skill with a newer catalog version), never by browsing.
  *
- * TODO(AG-3): implement MockMarketplaceCatalog against the layout Freshworks
+ * TODO(AG-4): implement MockMarketplaceCatalog against the layout Freshworks
  * shares. Put the mock catalog under packages/testkit/fixtures/marketplace/
  * (create it), synthetic names only.
  */

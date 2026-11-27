@@ -1,7 +1,8 @@
 # Data model
 
-Target schema. **BE-1** turns this into migrations and keeps this doc in step
-with them. Starting point is spec 7.4, plus what the tickets and the
+Target schema. Each backend ticket writes the migrations for its own tables
+and keeps its section of this doc in step: BE-1 ingestion, BE-2 identity,
+org and audit, BE-3 facts and rollups, BE-4 price book. Starting point is spec 7.4, plus what the tickets and the
 Freshworks answers added. Everything lives in the `app` schema.
 
 ```mermaid

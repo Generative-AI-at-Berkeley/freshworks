@@ -16,7 +16,7 @@ import type { Principal } from '../auth/principal.js';
  * `withCaller` (db.ts), so the check, the read and the access_log row all
  * happen in one transaction.
  *
- * TODO(BE-4): implement with a recursive CTE over manager_edge.
+ * TODO(BE-2): implement with a recursive CTE over manager_edge.
  */
 export interface AccessPolicy {
   canViewEngineer(

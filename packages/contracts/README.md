@@ -2,7 +2,8 @@
 
 The wire contract between the collector (`packages/collector`) and anything that
 receives its events (`services/ingest-mock` now, the Freshworks telemetry
-pipeline later). Owned by ticket **X-1**.
+pipeline later). Owned by **AG-2**. AG-3 adds the Cursor event types and
+AG-4 owns the proposed fields.
 
 What lives here:
 

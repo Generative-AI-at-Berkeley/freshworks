@@ -7,7 +7,7 @@ body:
     id: id
     attributes:
       label: Ticket ID
-      description: X-n (shared), BE-n (backend and data) or AG-n (agent and integration).
+      description: BE-n (backend and data) or AG-n (agent and integration).
       placeholder: BE-5
     validations:
       required: true
@@ -29,4 +29,4 @@ body:
     id: depends
     attributes:
       label: Depends on
-      placeholder: X-1, BE-1
+      placeholder: BE-1, AG-2

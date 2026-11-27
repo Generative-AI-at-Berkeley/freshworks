@@ -9,8 +9,8 @@ import type { DirectoryRecord } from '@fwcoach/contracts';
  * reproduces, and obviously fake (example.com, invented names) so it can never
  * be mistaken for, or mixed with, a real roster.
  *
- * TODO(BE-4): implement generateOrg. X-2 and the API integration tests both
- * build on it.
+ * TODO(BE-2): implement generateOrg. The API integration tests and AG-1's
+ * end-to-end run build on it.
  */
 export interface SyntheticOrgOptions {
   seed: number;
@@ -29,5 +29,5 @@ export interface SyntheticOrgOptions {
 export type SyntheticPerson = DirectoryRecord;
 
 export function generateOrg(_options: SyntheticOrgOptions): SyntheticPerson[] {
-  throw new Error('generateOrg not implemented (BE-4)');
+  throw new Error('generateOrg not implemented (BE-2)');
 }

@@ -8,7 +8,7 @@ not here (ADR 0002). Routes are registered in `src/routes/v1.ts` and return
 
 | Mode    | How the caller is identified                                               | Where                                                                                                                                            |
 | ------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `oidc`  | Bearer token from the corporate IdP. `sub` maps to `engineer.sso_subject`. | Anywhere real. TODO(BE-4).                                                                                                                       |
+| `oidc`  | Bearer token from the corporate IdP. `sub` maps to `engineer.sso_subject`. | Anywhere real. TODO(BE-2).                                                                                                                       |
 | `local` | `X-Dev-Engineer: <employee id>`, optional `X-Dev-Roles: platform_admin`    | Only when `NODE_ENV` is `development` or `test`, or with `API_ALLOW_HEADER_AUTH=true` (the compose demo, bound to localhost). Refused otherwise. |
 
 Roles: `engineer` (everyone), `manager` (derived from `manager_edge` on the
@@ -23,13 +23,13 @@ Data reads go through `withCaller` in `src/db.ts`.
 
 | Route                                       | Who can call it                                                        | Ticket |
 | ------------------------------------------- | ---------------------------------------------------------------------- | ------ |
-| `GET /v1/me/data`                           | Anyone, for themselves. Includes the raw rows behind their numbers.    | BE-4   |
+| `GET /v1/me/data`                           | Anyone, for themselves. Includes the raw rows behind their numbers.    | BE-2   |
 | `GET /v1/org/{orgUnitId}/overview`          | Managers of that unit, admins                                          | BE-3   |
 | `GET /v1/leaders/{managerId}/rollup?depth=` | That manager and their chain, admins                                   | BE-3   |
-| `GET /v1/engineers/{engineerId}`            | The engineer, their chain as of the date, admins. Writes `access_log`. | BE-4   |
-| `GET /v1/admin/access-log`                  | Admins                                                                 | BE-4   |
+| `GET /v1/engineers/{engineerId}`            | The engineer, their chain as of the date, admins. Writes `access_log`. | BE-2   |
+| `GET /v1/admin/access-log`                  | Admins                                                                 | BE-2   |
 | `GET /v1/skills/adoption`                   | Managers (scoped to subtree), admins                                   | BE-3   |
-| `GET /v1/fleet/health`                      | Admins                                                                 | BE-3   |
+| `GET /v1/fleet/health`                      | Admins                                                                 | BE-4   |
 | `GET /healthz`, `GET /readyz`               | Anyone. Liveness, and readiness including Postgres.                    | done   |
 
 ## Conventions
@@ -42,4 +42,4 @@ Data reads go through `withCaller` in `src/db.ts`.
 - No endpoint returns people ordered by volume. Distributions, not rankings.
 - Unknown is `null`, never `0`.
 
-TODO(BE-3, BE-4): add request and response examples for each route as it lands.
+TODO(BE-2, BE-3, BE-4): add request and response examples for each route as it lands.

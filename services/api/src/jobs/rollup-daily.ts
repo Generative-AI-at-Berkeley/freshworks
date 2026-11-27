@@ -10,7 +10,7 @@ import type pg from 'pg';
  * Subagent work is counted inside its parent session and also broken out in
  * its own columns (ADR 0003).
  *
- * TODO(BE-3): implement once BE-1 has the tables.
+ * TODO(BE-3): implement, along with migrations for the tables it fills.
  */
 export function rollupDay(_pool: pg.Pool, day: string): Promise<void> {
   return Promise.reject(new Error(`rollupDay(${day}) not implemented (BE-3)`));

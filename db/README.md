@@ -40,7 +40,7 @@ pnpm db:down            # roll back the latest one
 | ------------- | ----------------------------------------------------------------------------------------- |
 | `migrations/` | dbmate migrations, named `YYYYMMDDHHMMSS_what.sql`                                        |
 | `init/`       | Runs once when the compose volume is created: the local service user                      |
-| `seeds/`      | Not created yet. Reference data safe to load anywhere, like the default price book (BE-3) |
+| `seeds/`      | Not created yet. Reference data safe to load anywhere, like the default price book (BE-4) |
 
 Synthetic people and traffic are not seeds. They come from `packages/testkit`,
 so nobody loads fake engineers into a real database by accident.

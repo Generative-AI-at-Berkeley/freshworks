@@ -4,7 +4,7 @@ import { MemoryEventStore } from './store/memory-store.js';
 
 const config = loadConfig();
 
-// TODO(BE-2): PostgresEventStore when config.databaseUrl is set.
+// TODO(BE-1): PostgresEventStore when config.databaseUrl is set.
 const app = buildApp({ store: new MemoryEventStore() });
 
 for (const signal of ['SIGINT', 'SIGTERM'] as const) {

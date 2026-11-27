@@ -4,7 +4,7 @@ import { HarnessSchema } from './harness.js';
 
 /**
  * PROPOSED, NOT ACCEPTED. Fields we have asked Freshworks to add to the v2
- * pipeline (ticket X-1). Until they are accepted, the collector sends them
+ * pipeline (ticket AG-4). Until they are accepted, the collector sends them
  * under `ext.fwcoach`, which the format reserves for additions.
  *
  * Write the proposal in docs/contracts/proposed-fields.md in the same format

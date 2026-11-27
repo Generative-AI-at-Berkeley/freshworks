@@ -22,7 +22,7 @@ export interface Principal {
  *        to act as an admin. Dev, test and the local demo only (see config.ts).
  *        `manager` cannot be claimed by header: it is derived from
  *        manager_edge, same as with OIDC.
- * oidc:  TODO(BE-4). Verify the bearer token against the corporate IdP, map
+ * oidc:  TODO(BE-2). Verify the bearer token against the corporate IdP, map
  *        the `sub` claim to engineer.sso_subject. Endpoint and client ID come
  *        from configuration.
  */
@@ -36,6 +36,6 @@ export function resolvePrincipal(mode: AuthMode, request: FastifyRequest): Princ
   const claimed = typeof rawRoles === 'string' ? rawRoles.split(',').map((r) => r.trim()) : [];
   const roles: Role[] = [Role.Engineer];
   if (claimed.includes(Role.PlatformAdmin)) roles.push(Role.PlatformAdmin);
-  // TODO(BE-4): add Role.Manager when manager_edge says this engineer has reports.
+  // TODO(BE-2): add Role.Manager when manager_edge says this engineer has reports.
   return { engineerId, roles };
 }

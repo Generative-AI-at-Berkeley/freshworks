@@ -29,8 +29,8 @@ const pipelineIdes = new Set<string>(Object.values(PipelineIde));
  * Harnesses the pipeline does not accept yet keep their real name in
  * `ext.fwcoach.harness`. Cursor Agent goes out as `cursor`. Kiro has no
  * accepted equivalent, so it goes out as `kiro`, which the real pipeline may
- * reject until X-1 lands. The mock accepts it.
- * TODO(X-1): drop the fallback once Freshworks accepts kiro and cursor-agent.
+ * reject until the AG-4 field proposal is accepted. The mock accepts it.
+ * TODO(AG-4): drop the fallback once Freshworks accepts kiro and cursor-agent.
  */
 export function normalize(obs: Observation, ctx: NormalizeContext): TelemetryEvent {
   const ide = pipelineIdes.has(ctx.harness)

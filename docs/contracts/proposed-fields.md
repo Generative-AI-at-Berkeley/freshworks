@@ -1,6 +1,6 @@
 # Proposed fields
 
-Fields we need and the v2 pipeline does not carry. Owned by **X-1**. Written
+Fields we need and the v2 pipeline does not carry. Owned by **AG-4**. Written
 in the same shape as the Freshworks payload document so they can paste it
 into theirs.
 
@@ -33,8 +33,8 @@ Status: **draft, not yet sent.**
 | `source`   | string   | `kiro:session.json`    | Where the number was read                  |
 | `spent_at` | RFC 3339 | `2026-10-07T11:40:26Z` | When it was consumed, not when it was read |
 
-## TODO(X-1)
+## TODO(AG-4)
 
 - Fill in example events for each, in the doc's "full payload" style.
-- Add anything AG-2, AG-3 or AG-4 find they need while mapping formats.
+- Add anything AG-2 or AG-3 find they need while mapping formats.
 - Send to Freshworks, record the date and their answer here.

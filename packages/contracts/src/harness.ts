@@ -10,7 +10,7 @@ export const PipelineIde = {
 
 /**
  * Every harness this project reports on. `cursor-agent` and `kiro` are not
- * accepted by the pipeline yet (proposed in X-1). The sponsor spec (6.2)
+ * accepted by the pipeline yet (proposed in AG-4). The sponsor spec (6.2)
  * reports the Cursor IDE and the Cursor CLI agent as two harnesses so the
  * dashboards can tell IDE work from terminal work.
  */

@@ -9,7 +9,7 @@
  *
  * Changing a price recomputes rollups. It never rewrites raw events.
  *
- * TODO(BE-3): implement over the price_book table, with a default table
+ * TODO(BE-4): implement over the price_book table, with a default table
  * committed as a seed and overrides from organisation config.
  */
 export const TokenClass = {
