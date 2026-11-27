@@ -3,3 +3,4 @@ dist/
 coverage/
 .next/
 apps/dashboard/public/dew/
+apps/dashboard/next-env.d.ts
