@@ -1,0 +1,17 @@
+.empty {
+  padding: var(--spacing-600) var(--spacing-300);
+  text-align: center;
+  color: var(--color-text-secondary);
+}
+
+.emptyTitle {
+  margin: 0 0 var(--spacing-075);
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-150);
+}

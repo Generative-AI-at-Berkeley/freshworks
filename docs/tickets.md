@@ -132,6 +132,14 @@ a mock marketplace, and the field proposal to Freshworks.
 - Code: `packages/collector/src/adapters/kiro`, `src/skills`, `packages/contracts/src/proposed.ts`, `docs/formats/kiro.md`, `docs/contracts/proposed-fields.md`
 - Done: a Kiro session lands with credits and the parent and subagent link, and installed skills show up with invocation counts.
 
-## Not ticketed yet
+## Shared
 
-- Dashboards (spec 7.6). They can start once BE-2 and BE-3 have routes returning data.
+### X-3 Dashboards ([#16](https://github.com/Generative-AI-at-Berkeley/fwcoach/issues/16))
+
+The four views from spec 7.6 in Dew: skill adoption, leader drill-down, org
+overview, and practice health if there is time. Runs on a synthetic org until
+the backend routes land. Response shapes are drafts in
+`packages/contracts/src/api/` for BE-2, BE-3 and BE-4 to agree.
+
+- Code: `apps/dashboard`, `packages/contracts/src/api`
+- Done: all four views render in Dew against the compose stack, and every number matches the API for the same range.

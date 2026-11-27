@@ -1,0 +1,21 @@
+/*
+ * App-level styles only. Colors, type, spacing and radii come from Dew's CSS
+ * variables (@freshworks/dew-styles), so dark mode follows the theme class on
+ * <html>. Never hardcode a color here.
+ */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-fill-container);
+  color: var(--color-text-primary);
+  font-family: var(--base-font-family);
+  font-size: 14px;
+}
+
+a {
+  color: inherit;
+}

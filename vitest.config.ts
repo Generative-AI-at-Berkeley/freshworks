@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     coverage: {
       provider: 'v8',
-      include: ['packages/*/src/**', 'services/*/src/**'],
+      include: ['packages/*/src/**', 'services/*/src/**', 'apps/*/src/**'],
       exclude: ['**/*.test.ts', '**/main.ts'],
     },
     projects: [
@@ -21,6 +21,22 @@ export default defineConfig({
           name: 'unit',
           include: ['packages/*/src/**/*.test.ts', 'services/*/src/**/*.test.ts'],
           exclude: ['**/*.int.test.ts'],
+        },
+      },
+      {
+        // The dashboard's server and data code. Same conditions, plus its `@/` alias.
+        // `server-only` throws outside Next's server bundle, so tests get a stub.
+        extends: true,
+        resolve: {
+          alias: {
+            '@/': new URL('./apps/dashboard/src/', import.meta.url).pathname,
+            'server-only': new URL('./apps/dashboard/test/server-only-stub.ts', import.meta.url)
+              .pathname,
+          },
+        },
+        test: {
+          name: 'dashboard',
+          include: ['apps/dashboard/src/**/*.test.ts'],
         },
       },
       {
