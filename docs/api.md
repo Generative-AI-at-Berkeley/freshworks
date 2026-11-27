@@ -4,6 +4,11 @@
 not here (ADR 0002). Routes are registered in `src/routes/v1.ts` and return
 501 until their ticket lands.
 
+The OpenAPI 3.1 document is [openapi.json](openapi.json). It is generated from
+the Zod schemas in `packages/contracts/src/api` by `pnpm gen:openapi`, and CI
+fails if the committed copy is stale. Routes still waiting on a ticket are
+marked `x-status: draft`.
+
 ## Auth
 
 | Mode    | How the caller is identified                                               | Where                                                                                                                                            |

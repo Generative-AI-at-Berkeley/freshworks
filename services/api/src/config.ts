@@ -31,11 +31,11 @@ export type ApiConfig = z.infer<typeof ApiConfig>;
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ApiConfig {
   const parsed = ApiConfig.safeParse({
     // APP_DATABASE_URL in .env, so the API never picks up dbmate's owner URL by accident.
-    databaseUrl: env.APP_DATABASE_URL,
-    port: env.API_PORT,
-    authMode: env.API_AUTH_MODE,
-    nodeEnv: env.NODE_ENV,
-    allowHeaderAuth: env.API_ALLOW_HEADER_AUTH,
+    databaseUrl: env['APP_DATABASE_URL'],
+    port: env['API_PORT'],
+    authMode: env['API_AUTH_MODE'],
+    nodeEnv: env['NODE_ENV'],
+    allowHeaderAuth: env['API_ALLOW_HEADER_AUTH'],
   });
   if (!parsed.success) throw new Error(`Invalid API config.\n${z.prettifyError(parsed.error)}`);
   return parsed.data;

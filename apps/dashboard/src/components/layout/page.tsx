@@ -10,7 +10,7 @@ import { parsePreset, RANGE_PRESETS } from '@/lib/range';
 
 import styles from './page.module.css';
 
-export interface Crumb {
+interface Crumb {
   label: string;
   href: string;
 }

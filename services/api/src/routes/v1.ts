@@ -53,6 +53,6 @@ export function v1(config: Pick<ApiConfig, 'authMode'>) {
   };
 }
 
-export function problem(reply: FastifyReply, status: number, detail: string) {
+function problem(reply: FastifyReply, status: number, detail: string) {
   return reply.status(status).type('application/problem+json').send({ status, detail });
 }

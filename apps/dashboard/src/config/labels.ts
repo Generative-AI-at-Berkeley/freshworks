@@ -1,7 +1,7 @@
 import { Harness } from '@fwcoach/contracts';
 
 /** Display names for every harness. A new harness fails the type check here until it has one. */
-export const HARNESS_LABEL: Record<Harness, string> = {
+const HARNESS_LABEL: Record<Harness, string> = {
   [Harness.ClaudeCode]: 'Claude Code',
   [Harness.Cursor]: 'Cursor IDE',
   [Harness.CursorAgent]: 'Cursor Agent',

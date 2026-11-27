@@ -40,7 +40,11 @@ jobs:
       - run: pnpm lint:content
       - run: pnpm lint:deps
       - run: pnpm lint:rules
+      - run: pnpm lint:unused
       - run: pnpm typecheck
+      # docs/openapi.json is generated from the contracts. Fail if it is stale.
+      - run: pnpm gen:openapi
+      - run: git diff --exit-code docs/openapi.json
 
   test:
     name: unit tests (node ${{ matrix.node }})

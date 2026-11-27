@@ -1,0 +1,35 @@
+{
+  "$schema": "https://unpkg.com/knip@6.45.1/schema-jsonc.json",
+  "workspaces": {
+    ".": {
+      "project": ["scripts/**/*.ts", "*.{ts,mjs}"],
+    },
+    "packages/*": {
+      "project": ["src/**/*.ts"],
+    },
+    "services/*": {
+      "project": ["src/**/*.ts"],
+    },
+    "apps/dashboard": {
+      "project": ["src/**/*.{ts,tsx}", "test/**/*.ts", "scripts/**/*.mjs"],
+    },
+    "e2e": {
+      "project": ["**/*.ts"],
+    },
+  },
+  // Ticket seams: interfaces that exist so a ticket has something to implement.
+  // Drop each line when its ticket lands and something imports the file.
+  "ignore": [
+    // TODO(BE-2): AccessPolicy, implemented with a recursive CTE over manager_edge.
+    "services/api/src/access/policy.ts",
+    // TODO(BE-2): DirectorySource, with the CSV fallback and the testkit adapter.
+    "services/api/src/directory/source.ts",
+    // TODO(BE-4): the price book over the price_book table.
+    "services/api/src/pricing/price-book.ts",
+  ],
+  "ignoreIssues": {
+    // TODO(BE-1): the retention job reads this. ADR 0006 and the retention
+    // runbook name it as the one place the period is set.
+    "services/api/src/jobs/retention.ts": ["exports"],
+  },
+}

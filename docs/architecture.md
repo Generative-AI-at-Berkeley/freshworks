@@ -33,7 +33,11 @@ flowchart TB
     AGG & ORG --> API[query API<br/>OIDC, hierarchy-aware access,<br/>access_log]
   end
 
-  API --> DASH[dashboards]
+  subgraph dash[Dashboard, apps/dashboard]
+    BR[browser] -- "same-origin /api only" --> PX[proxy<br/>/api/v1, adds identity<br/>server side]
+  end
+
+  PX -- "identity from server config" --> API
 ```
 
 ### Collector (`packages/collector`)
@@ -101,6 +105,10 @@ and every allowed individual view is written to `access_log`.
 | [0006](decisions/0006-retention.md)                          | 13 months of detail, summaries kept                                      |
 | [0007](decisions/0007-public-repo-hygiene.md)                | Public repo: internal anything arrives as config                         |
 | [0008](decisions/0008-repo-layout.md)                        | Where code goes per workspace, and the import boundaries CI checks       |
+| [0009](decisions/0009-self-hosted-postgres-dbmate.md)        | Self-hosted Postgres 18, plain SQL migrations with dbmate                |
+| [0010](decisions/0010-access-checked-twice.md)               | Access to an individual checked by AccessPolicy and again by RLS         |
+| [0011](decisions/0011-auth-modes.md)                         | OIDC in production; dev headers only in dev, test or the local demo      |
+| [0012](decisions/0012-dashboard-proxy.md)                    | The browser talks only to the dashboard proxy, which adds identity       |
 
 ## Not in this repo yet
 

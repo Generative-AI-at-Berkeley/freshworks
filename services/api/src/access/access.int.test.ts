@@ -17,8 +17,8 @@ import { createPool, withCaller } from '../db.js';
  */
 
 // Owner for seeding (dbmate's URL), service user for every caller-scoped query.
-const ownerUrl = process.env.DATABASE_URL;
-const appUrl = process.env.APP_DATABASE_URL;
+const ownerUrl = process.env['DATABASE_URL'];
+const appUrl = process.env['APP_DATABASE_URL'];
 
 const REORG = new Date('2026-06-01');
 const BEFORE = '2026-03-01';

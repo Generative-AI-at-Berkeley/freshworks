@@ -45,7 +45,7 @@ export function Delta({
 }
 
 /** A label that explains how its number is counted, in a Dew tooltip. */
-export function Defined({ label, definition }: { label: string; definition?: string }) {
+function Defined({ label, definition }: { label: string; definition?: string }) {
   if (!definition) return <>{label}</>;
   return (
     <span className={styles.definedRow}>

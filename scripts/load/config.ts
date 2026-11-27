@@ -24,7 +24,7 @@ const BatchSize = z.object({
   max: z.number().int().max(500),
 });
 
-export const LoadFile = z.object({
+const LoadFile = z.object({
   profile: z.object({
     /** Assumed fleet size. No doc gives one yet. */
     devices: z.number().int().min(1),
@@ -53,7 +53,6 @@ export const LoadFile = z.object({
     validErrorRate: z.number().min(0).max(1),
   }),
 });
-export type LoadFile = z.infer<typeof LoadFile>;
 
 export const LoadConfig = LoadFile.extend({
   /** Same variable as the e2e suite. Point it at the real pipeline later. */
@@ -73,11 +72,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): LoadConfig {
   );
   const parsed = LoadConfig.safeParse({
     ...(file as object),
-    ingestUrl: env.INGEST_URL ?? `http://localhost:${env.INGEST_PORT ?? '4318'}`,
-    durationSeconds: env.LOAD_DURATION_SECONDS,
-    countCheck: env.LOAD_COUNT_CHECK,
-    outDir: env.LOAD_OUT_DIR,
-    seed: env.LOAD_SEED,
+    ingestUrl: env['INGEST_URL'] ?? `http://localhost:${env['INGEST_PORT'] ?? '4318'}`,
+    durationSeconds: env['LOAD_DURATION_SECONDS'],
+    countCheck: env['LOAD_COUNT_CHECK'],
+    outDir: env['LOAD_OUT_DIR'],
+    seed: env['LOAD_SEED'],
   });
   if (!parsed.success) {
     throw new Error(

@@ -5,7 +5,7 @@ This repository is public. Treat everything committed here as published.
 ## Reporting
 
 Report a vulnerability privately through
-[GitHub security advisories](https://github.com/Generative-AI-at-Berkeley/freshworks/security/advisories/new).
+[GitHub security advisories](https://github.com/Generative-AI-at-Berkeley/fwcoach/security/advisories/new).
 Do not open a public issue or PR that describes it.
 
 ## If you committed something you should not have
