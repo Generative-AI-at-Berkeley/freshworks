@@ -1465,6 +1465,9 @@
           },
           "detail": {
             "type": "string"
+          },
+          "requestId": {
+            "type": "string"
           }
         },
         "required": ["status", "detail"],
