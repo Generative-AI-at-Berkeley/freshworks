@@ -15,6 +15,11 @@ export const DemoConfig = z.object({
 });
 export type DemoConfig = z.infer<typeof DemoConfig>;
 
+/** What child processes inherit, so docker compose reads the same port variables. */
+export function inheritedEnv(): NodeJS.ProcessEnv {
+  return { ...process.env };
+}
+
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): DemoConfig {
   const parsed = DemoConfig.safeParse({
     postgresPort: env.POSTGRES_PORT,

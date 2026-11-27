@@ -20,7 +20,7 @@ import {
   type SyntheticPerson,
 } from '@fwcoach/testkit';
 
-import { loadConfig, type DemoConfig } from './config.js';
+import { inheritedEnv, loadConfig, type DemoConfig } from './config.js';
 
 const PROJECT = 'fwcoach-demo';
 const AGENT_VERSION = 'demo';
@@ -50,7 +50,7 @@ const degrade = (ticket: string, line: string): void => {
 
 function compose(args: string[], options: { env?: NodeJS.ProcessEnv; quiet?: boolean } = {}) {
   const result = spawnSync('docker', ['compose', '-p', PROJECT, ...args], {
-    env: { ...process.env, ...options.env },
+    env: { ...inheritedEnv(), ...options.env },
     stdio: options.quiet ? 'pipe' : 'inherit',
     encoding: 'utf8',
   });

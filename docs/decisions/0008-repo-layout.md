@@ -31,7 +31,8 @@ collector, no hardcoded colors in the dashboard, and a ticket on every TODO.
 
 Every package reads its environment in one file: `src/config.ts`. The
 dashboard's is `src/config/server.ts`, because it must stay off the browser
-bundle. Unit tests sit beside the code as `*.test.ts`. Tests that need
+bundle. Scripts read it in a `config.ts` next to them, like
+`scripts/demo/config.ts`. Unit tests sit beside the code as `*.test.ts`. Tests that need
 Postgres are `*.int.test.ts`.
 
 ### Boundaries
