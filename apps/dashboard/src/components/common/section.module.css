@@ -59,5 +59,4 @@
   display: flex;
   justify-content: flex-end;
   padding-top: var(--spacing-150);
-  border-top: 1px solid var(--fw-line);
 }

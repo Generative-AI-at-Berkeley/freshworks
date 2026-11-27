@@ -75,7 +75,7 @@
   align-items: center;
   gap: var(--spacing-050);
   font-size: 13px;
-  line-height: 16px;
+  line-height: 20px;
   font-weight: var(--font-weight-semi-bold);
   white-space: nowrap;
 }

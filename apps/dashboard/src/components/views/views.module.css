@@ -96,18 +96,23 @@
 }
 
 .shareCell {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  max-width: 9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-100);
+  white-space: nowrap;
+}
+
+/* The bar leads, then the number, all on one line like the other cells. */
+.shareCell > [role='img'] {
+  order: -1;
+  flex: none;
+  width: 56px;
 }
 
 .shareTop {
-  display: flex;
+  display: inline-flex;
   align-items: baseline;
-  gap: 8px;
-  white-space: nowrap;
+  gap: var(--spacing-075);
 }
 
 .shareValue {

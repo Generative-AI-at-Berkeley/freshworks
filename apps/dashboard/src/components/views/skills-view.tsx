@@ -254,7 +254,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
   return (
     <Section
       title="All skills"
-      info="Adoption is engineers who used a skill in the period, out of engineers who have it installed. Users per day averages the last 7 days."
+      info="Adoption is engineers who used a skill in the period, out of engineers who have it installed. Daily users averages the last 7 days."
       footer={nav}
     >
       <div className={styles.toolbar}>
@@ -319,57 +319,63 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
                 id: 'name',
                 accessorFn: (row: SkillRow) => row.skill.name,
                 header: 'Skill',
-                size: 200,
+                size: 160,
                 cell: ({ row }) => (
-                  <span className={styles.nameCell}>
-                    <NextLink
-                      href={withRange(ROUTES.skill(row.original.id))}
-                      className={styles.skillLink}
-                      onClick={(event) => {
-                        event.stopPropagation();
-                      }}
-                    >
-                      {row.original.skill.name}
-                    </NextLink>
-                    <span className={styles.tool}>{harnessLabel(row.original.skill.harness)}</span>
-                  </span>
+                  <NextLink
+                    href={withRange(ROUTES.skill(row.original.id))}
+                    className={styles.skillLink}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
+                  >
+                    {row.original.skill.name}
+                  </NextLink>
                 ),
+              },
+              {
+                id: 'tool',
+                header: 'Tool',
+                size: 120,
+                enableSorting: false,
+                cell: ({ row }) => harnessLabel(row.original.skill.harness),
               },
               {
                 id: 'status',
                 accessorFn: (row: SkillRow) => row.status,
                 header: 'Status',
-                size: 150,
+                size: 120,
                 cell: ({ row }) => <StatusLabel status={row.original.status} />,
               },
               {
                 id: 'adoption',
                 accessorFn: (row: SkillRow) => row.rate,
                 header: 'Adoption',
-                size: 190,
+                size: 250,
                 cell: ({ row }) => {
                   const { skill, rate, previousRate } = row.original;
                   const delta = formatPointsDelta(rate, previousRate);
                   return (
-                    <span className={styles.adoption}>
-                      <span className={styles.adoptionTop}>
-                        <span className={styles.rate}>
-                          <Value value={rate} format={formatPercent} />
-                        </span>
-                        <span className={styles.secondary}>
-                          {`${formatCount(skill.activeEngineers)} of ${formatCount(skill.installedEngineers)}`}
-                        </span>
-                        {delta && delta !== 'No change' && (
-                          <span title={`Change in adoption vs the previous ${String(days)} days`}>
-                            <Delta text={delta} tone={toneOf(delta)} />
-                          </span>
-                        )}
+                    <span className={styles.inline}>
+                      <span className={styles.meter}>
+                        <Meter
+                          share={rate ?? 0}
+                          label={`${formatPercent(rate ?? 0)} adoption`}
+                          tone={rate === 0 ? 'muted' : 'data'}
+                        />
                       </span>
-                      <Meter
-                        share={rate ?? 0}
-                        label={`${formatPercent(rate ?? 0)} adoption`}
-                        tone={rate === 0 ? 'muted' : 'data'}
-                      />
+                      <span className={styles.rate}>
+                        <Value value={rate} format={formatPercent} />
+                      </span>
+                      <span className={styles.secondary}>
+                        {`${formatCount(skill.activeEngineers)} of ${formatCount(skill.installedEngineers)}`}
+                      </span>
+                      {delta && delta !== 'No change' && (
+                        <Delta
+                          text={delta}
+                          tone={toneOf(delta)}
+                          against={`vs previous ${String(days)} days`}
+                        />
+                      )}
                     </span>
                   );
                 },
@@ -377,28 +383,30 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
               {
                 id: 'dailyUsers',
                 accessorFn: (row: SkillRow) => row.week?.current ?? null,
-                header: 'Users per day',
-                size: 180,
+                header: 'Daily users',
+                size: 120,
                 cell: ({ row }) => {
                   const { week } = row.original;
                   if (!week) return <span className={styles.secondary}>Needs 14 days</span>;
                   const diff = week.current - week.prior;
                   return (
-                    <span className={styles.daily}>
+                    <span className={styles.inline}>
                       <span className={styles.rate}>{week.current.toFixed(1)}</span>
-                      <span className={styles.secondary}>
-                        {Math.abs(diff) < 0.05
-                          ? 'flat'
-                          : `${diff > 0 ? '+' : '−'}${Math.abs(diff).toFixed(1)} vs prior week`}
-                      </span>
+                      {Math.abs(diff) >= 0.05 && (
+                        <Delta
+                          text={`${diff > 0 ? '+' : '-'}${Math.abs(diff).toFixed(1)}`}
+                          tone={diff > 0 ? 'up' : 'down'}
+                          against="vs the week before"
+                        />
+                      )}
                     </span>
                   );
                 },
               },
               {
                 id: 'trend',
-                header: `Trend, ${String(days)} days`,
-                size: 140,
+                header: 'Trend',
+                size: 90,
                 enableSorting: false,
                 cell: ({ row }) => {
                   const points = row.original.skill.trend;
@@ -415,14 +423,14 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
                 id: 'uses',
                 accessorFn: (row: SkillRow) => row.skill.invocations,
                 header: 'Uses',
-                size: 90,
+                size: 95,
                 cell: ({ row }) => formatCount(row.original.skill.invocations),
               },
               {
                 id: 'firstUse',
                 accessorFn: (row: SkillRow) => row.skill.medianDaysToFirstUse,
                 header: 'First use',
-                size: 140,
+                size: 120,
                 cell: ({ row }) => (
                   <Value
                     value={row.original.skill.medianDaysToFirstUse}

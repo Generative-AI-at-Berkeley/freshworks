@@ -76,6 +76,7 @@
 }
 
 .toolbar {
+  margin-bottom: var(--spacing-200);
   display: flex;
   align-items: center;
   gap: var(--spacing-150);
@@ -94,28 +95,6 @@
   overflow-x: auto;
 }
 
-.nameCell,
-.daily {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.adoption {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-100);
-  width: 100%;
-  max-width: 9rem;
-}
-
-.adoptionTop {
-  display: flex;
-  align-items: baseline;
-  gap: var(--spacing-100);
-  white-space: nowrap;
-}
-
 .rate {
   color: var(--color-text-primary);
   font-weight: var(--font-weight-semi-bold);
@@ -131,4 +110,18 @@
   .grid {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Table cells stay on one line so every row reads at the same baseline. */
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-100);
+  white-space: nowrap;
+}
+
+.meter {
+  display: inline-flex;
+  width: 48px;
+  flex: none;
 }
