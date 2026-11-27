@@ -18,7 +18,8 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@types/pg": "8.23.1"
+    "@types/pg": "8.23.1",
+    "@fwcoach/testkit": "workspace:*"
   },
   "files": [
     "dist"

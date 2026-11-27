@@ -18,3 +18,7 @@ coverage/
 *.xlsx
 *.vscdb
 roster*.csv
+
+# Playwright output (e2e/dashboard).
+test-results/
+playwright-report/

@@ -22,6 +22,7 @@
     "test:watch": "vitest --project unit --project dashboard",
     "test:int": "vitest run --project integration",
     "test:e2e": "vitest run --project e2e",
+    "test:dashboard": "pnpm --filter @fwcoach/e2e test:dashboard",
     "db:up": "dbmate --wait up",
     "db:down": "dbmate rollback",
     "db:new": "dbmate new",

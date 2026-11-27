@@ -4,3 +4,5 @@ coverage/
 .next/
 apps/dashboard/public/dew/
 apps/dashboard/next-env.d.ts
+test-results/
+playwright-report/
