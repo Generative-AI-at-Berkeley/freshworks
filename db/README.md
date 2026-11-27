@@ -31,7 +31,9 @@ pnpm db:down            # roll back the latest one
 - **Expensive changes are flagged in the PR.** A new index on a large table,
   a column rewrite, or a lock on `events` needs a note saying how long it
   holds the lock, or `create index concurrently` in its own migration (dbmate:
-  add `-- migrate:up transaction:false`).
+  add `-- migrate:up transaction:false`). CI runs
+  [squawk](https://squawkhq.com) on every `migrate:up` section to catch the
+  common ones. Run it locally with `pnpm lint:migrations`.
 - **Data model changes update docs/data-model.md in the same PR.**
 
 ## Layout

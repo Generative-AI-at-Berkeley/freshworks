@@ -160,12 +160,41 @@ jobs:
           tar -xzf gitleaks.tgz gitleaks
       - run: ./gitleaks git --config .gitleaks.toml --redact --verbose .
 
+  migration-lint:
+    name: migration lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      # Squawk flags locks and rewrites that are fine on an empty table and an
+      # outage on a busy one. Rules and exclusions are in .squawk.toml.
+      - run: pnpm lint:migrations
+
+  links:
+    name: docs links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          # Offline checks relative links and their #anchors. External sites
+          # rate limit and go down, which would make this check flaky.
+          args: >-
+            --offline --include-fragments --hidden --no-progress
+            --exclude-path node_modules
+            './**/*.md'
+
   # The one check branch protection requires. Add new jobs to `needs` and the
   # ruleset never has to change.
   ci-ok:
     name: ci-ok
     if: always()
-    needs: [lint, test, db, build, e2e, secrets]
+    needs: [lint, test, db, build, e2e, secrets, migration-lint, links]
     runs-on: ubuntu-latest
     steps:
       - name: every required job passed

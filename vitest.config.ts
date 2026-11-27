@@ -13,6 +13,14 @@ export default defineConfig({
       provider: 'v8',
       include: ['packages/*/src/**', 'services/*/src/**', 'apps/*/src/**'],
       exclude: ['**/*.test.ts', '**/main.ts'],
+      // Floors set just under the measured numbers (44.27, 37.48, 30.63, 44.88)
+      // so coverage cannot quietly drop. Raise them as tickets land tests.
+      thresholds: {
+        statements: 44,
+        branches: 37,
+        functions: 30,
+        lines: 44,
+      },
     },
     projects: [
       {
