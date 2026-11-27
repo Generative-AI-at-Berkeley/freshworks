@@ -22,6 +22,7 @@
     "test:watch": "vitest --project unit --project dashboard",
     "test:int": "vitest run --project integration",
     "test:e2e": "vitest run --project e2e",
+    "test:load": "tsx --env-file-if-exists=.env --conditions=@fwcoach/source scripts/load/main.ts",
     "test:dashboard": "pnpm --filter @fwcoach/e2e test:dashboard",
     "db:up": "dbmate --wait up",
     "db:down": "dbmate rollback",
@@ -55,6 +56,7 @@
     "tsx": "4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "8.74.0",
+    "undici": "7.30.1",
     "vitest": "5.1.2",
     "zod": "4.6.7"
   },
