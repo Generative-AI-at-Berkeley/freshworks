@@ -22,6 +22,8 @@ const noop = () => () => undefined;
 
 function Rail() {
   const pathname = usePathname();
+  const session = useSession();
+  const isAdmin = session.data?.isAdmin ?? false;
   // Dew's Tooltip reads `document` while rendering, so it joins after hydration.
   const mounted = useSyncExternalStore(
     noop,
@@ -32,7 +34,7 @@ function Rail() {
   const withRange = useWithRange();
   return (
     <nav className={styles.rail} aria-label="Main">
-      {NAV_GROUPS.map((group) => (
+      {NAV_GROUPS.filter((group) => !group.adminOnly || isAdmin).map((group) => (
         <ul key={group.label} className={styles.group} aria-label={group.label}>
           {group.items.map((item) => {
             const active = item.isActive(pathname);

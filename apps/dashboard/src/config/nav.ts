@@ -19,6 +19,8 @@ export interface NavItem {
 
 export interface NavGroup {
   label: string;
+  /** Shown only to platform admins. The API enforces the same rule. */
+  adminOnly?: boolean;
   items: readonly NavItem[];
 }
 
@@ -67,6 +69,38 @@ export const NAV_GROUPS: readonly NavGroup[] = [
         icon: 'LeftNavBar/Workload',
         activeIcon: 'LeftNavBar/WorkloadSelected',
         isActive: startsWith(ROUTES.practice),
+      },
+    ],
+  },
+  {
+    label: 'You',
+    items: [
+      {
+        label: 'My data',
+        href: ROUTES.me,
+        icon: 'LeftNavBar/User',
+        activeIcon: 'LeftNavBar/UserSelected',
+        isActive: startsWith(ROUTES.me),
+      },
+    ],
+  },
+  {
+    label: 'Admin',
+    adminOnly: true,
+    items: [
+      {
+        label: 'Fleet health',
+        href: ROUTES.fleet,
+        icon: 'LeftNavBar/ITOperations',
+        activeIcon: 'LeftNavBar/ITOperationsSelected',
+        isActive: startsWith(ROUTES.fleet),
+      },
+      {
+        label: 'Access log',
+        href: ROUTES.accessLog,
+        icon: 'LeftNavBar/AuditLogs',
+        activeIcon: 'LeftNavBar/AuditLogsSelected',
+        isActive: startsWith(ROUTES.accessLog),
       },
     ],
   },

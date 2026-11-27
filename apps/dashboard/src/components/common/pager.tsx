@@ -49,3 +49,44 @@ export function Paged<T>({
   const { visible, nav } = usePaged(items, perPage);
   return <>{children(visible, nav)}</>;
 }
+
+/**
+ * Paging for routes that return a cursor. Keeps the cursors already visited
+ * so "previous" works without the API supporting it.
+ */
+export function useCursorPages(): {
+  cursor: string | null;
+  nav: (page: { shown: number; total: number; nextCursor: string | null }) => ReactNode;
+  reset: () => void;
+} {
+  const [stack, setStack] = useState<(string | null)[]>([null]);
+  const [offsets, setOffsets] = useState<number[]>([0]);
+  const cursor = stack.at(-1) ?? null;
+  const offset = offsets.at(-1) ?? 0;
+  return {
+    cursor,
+    reset: () => {
+      setStack([null]);
+      setOffsets([0]);
+    },
+    nav: ({ shown, total, nextCursor }) =>
+      total > shown || stack.length > 1 ? (
+        <PageNavigation
+          rangeStart={total === 0 ? 0 : offset + 1}
+          rangeEnd={offset + shown}
+          totalItems={total}
+          isPreviousDisabled={stack.length <= 1}
+          isNextDisabled={nextCursor === null}
+          onPrevious={() => {
+            setStack((s) => s.slice(0, -1));
+            setOffsets((o) => o.slice(0, -1));
+          }}
+          onNext={() => {
+            if (nextCursor === null) return;
+            setStack((s) => [...s, nextCursor]);
+            setOffsets((o) => [...o, offset + shown]);
+          }}
+        />
+      ) : null,
+  };
+}

@@ -14,5 +14,10 @@ export const Session = z.strictObject({
   /** Display names when the dashboard knows them. Null shows the id instead. */
   displayName: z.string().nullable(),
   orgUnitName: z.string().nullable(),
+  /**
+   * Whether to show admin pages. Navigation only: the API still checks the
+   * role on every admin route, so a wrong value shows a 403, not data.
+   */
+  isAdmin: z.boolean(),
 });
 export type Session = z.infer<typeof Session>;

@@ -8,4 +8,7 @@ export const queryKeys = {
   leaderRollup: (managerId: string, depth: number, range: DayRange) =>
     ['leaders', managerId, depth, range] as const,
   engineer: (engineerId: string, range: DayRange) => ['engineers', engineerId, range] as const,
+  fleetHealth: (range: DayRange) => ['fleet', range] as const,
+  accessLog: (range: DayRange, cursor: string | null) => ['access-log', range, cursor] as const,
+  myData: (range: DayRange, cursor: string | null) => ['me', range, cursor] as const,
 };
