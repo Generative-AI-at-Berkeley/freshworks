@@ -17,8 +17,8 @@
     "@fwcoach/contracts": "workspace:*",
     "@tanstack/react-query": "5.108.4",
     "next": "16.4.6",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "server-only": "0.0.1",
     "zod": "4.6.7"
   },
