@@ -40,3 +40,23 @@ export function formatCoverage(coverage: number, what: string): string {
 export function adoptionShare(active: number, installed: number): number | null {
   return installed === 0 ? null : active / installed;
 }
+
+const shortDate = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  timeZone: 'UTC',
+});
+const fullDate = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  timeZone: 'UTC',
+});
+
+/** "Oct 30 to Nov 26, 2026". `to` is exclusive in the API, so the last day shown is the one before it. */
+export function formatRange(range: { from: string; to: string }): string {
+  const from = new Date(`${range.from}T00:00:00Z`);
+  const last = new Date(`${range.to}T00:00:00Z`);
+  last.setUTCDate(last.getUTCDate() - 1);
+  return `${shortDate.format(from)} to ${fullDate.format(last)}`;
+}

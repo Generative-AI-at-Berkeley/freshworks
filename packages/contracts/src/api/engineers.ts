@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { HarnessSchema } from '../harness.js';
-import { Range } from './common.js';
+import { PersonRef, Range } from './common.js';
 
 /**
  * `GET /v1/engineers/{engineerId}`. Draft from X-3 (dashboard). BE-2 owns the
@@ -16,6 +16,8 @@ export const EngineerDetail = z.strictObject({
     name: z.string(),
     orgUnit: z.strictObject({ id: z.string(), name: z.string() }),
   }),
+  /** Managers above the engineer, top first, as of the end of the range. */
+  chain: z.array(PersonRef),
   range: Range,
   harnesses: z.array(z.strictObject({ harness: HarnessSchema, activeDays: z.number().int() })),
   skillsInstalled: z.array(

@@ -69,7 +69,8 @@
 .footer {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-100);
+  align-items: flex-start;
+  gap: var(--spacing-150);
   color: var(--color-text-secondary);
   font-size: 12px;
 }
@@ -81,4 +82,40 @@
   flex-direction: column;
   overflow: hidden;
   background: var(--color-fill-surface);
+}
+
+/* Phones: the sidebar becomes a top bar and the nav scrolls sideways. */
+@media (max-width: 768px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar,
+  .collapsed {
+    width: auto;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-150);
+    padding: var(--spacing-100) var(--spacing-200);
+    border-right: none;
+    border-bottom: 1px solid var(--color-boundary-border-mildest);
+  }
+
+  .brand button {
+    display: none;
+  }
+
+  .nav {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .link {
+    flex-shrink: 0;
+  }
+
+  .footer {
+    display: none;
+  }
 }

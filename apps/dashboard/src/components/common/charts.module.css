@@ -1,0 +1,83 @@
+/*
+ * Small single-series charts. One series means one hue (Dew brand), no legend:
+ * the column header or section title names it. Track and grid stay recessive.
+ */
+.meter {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-150);
+  min-width: 0;
+}
+
+.track {
+  display: block;
+  flex: 1;
+  min-width: 3rem;
+  max-width: 9rem;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-fill-base);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-fill-brand);
+}
+
+.meterLabel {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.spark {
+  display: block;
+  color: var(--color-fill-brand);
+}
+
+.histogram {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  align-items: end;
+  gap: 2px;
+  height: 120px;
+  max-width: 24rem;
+  border-bottom: 1px solid var(--color-boundary-border-mild);
+}
+
+.bin {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+}
+
+.bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  background: var(--color-fill-brand);
+}
+
+.binCount {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-050);
+  font-variant-numeric: tabular-nums;
+}
+
+.axis {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 2px;
+  max-width: 24rem;
+  margin-top: var(--spacing-075);
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  text-align: center;
+}

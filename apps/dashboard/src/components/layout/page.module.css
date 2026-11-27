@@ -1,19 +1,41 @@
 .header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-200);
-  flex-wrap: wrap;
-  min-height: 3.25rem;
-  padding: var(--spacing-100) var(--spacing-300);
+  flex-direction: column;
+  gap: var(--spacing-075);
+  padding: var(--spacing-250) var(--spacing-400) var(--spacing-200);
   border-bottom: 1px solid var(--color-boundary-border-mildest);
   flex-shrink: 0;
 }
 
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-200);
+  flex-wrap: wrap;
+}
+
 .title {
   margin: 0;
-  font-size: 16px;
+  font-size: 20px;
+  line-height: 28px;
   font-weight: var(--font-weight-semi-bold);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.range {
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.description {
+  margin: 0;
+  max-width: 44rem;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 20px;
 }
 
 .body {
@@ -21,8 +43,22 @@
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: var(--spacing-300);
+  padding: var(--spacing-300) var(--spacing-400) var(--spacing-600);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-300);
+  gap: var(--spacing-400);
+}
+
+/* The body scrolls; its children must keep their height instead of shrinking to fit. */
+.body > * {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding-inline: var(--spacing-200);
+  }
+  .body {
+    padding-inline: var(--spacing-200);
+  }
 }

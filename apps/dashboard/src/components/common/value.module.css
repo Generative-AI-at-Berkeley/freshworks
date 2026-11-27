@@ -1,0 +1,14 @@
+.unknown {
+  color: var(--color-text-placeholder);
+}
+
+.secondary {
+  display: block;
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}

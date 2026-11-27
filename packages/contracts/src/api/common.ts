@@ -36,6 +36,9 @@ export const Distribution = z.strictObject({
   ),
 });
 
+/** A person in a management chain, for breadcrumbs. */
+export const PersonRef = z.strictObject({ id: z.string(), name: z.string() });
+
 /** A date range as the API echoes it back: `from` inclusive, `to` exclusive. */
 export const Range = z.strictObject({ from: Day, to: Day });
 

@@ -1,7 +1,15 @@
 import type { api } from '@fwcoach/contracts';
 
 import type { DayRange } from '@/lib/range';
-import { directReports, isOrgUnitId, ORG_UNITS, person, PEOPLE, subtree } from '@/mock/org';
+import {
+  chainAbove,
+  directReports,
+  isOrgUnitId,
+  ORG_UNITS,
+  person,
+  PEOPLE,
+  subtree,
+} from '@/mock/org';
 
 /**
  * Mock responses for each query API route, typed against the contract so a
@@ -186,6 +194,7 @@ export function leaderRollup(
   const { managerId: _id, managerName: _name, ...total } = team(manager);
   return {
     manager: { id: manager.id, name: manager.name },
+    chain: chainAbove(manager.id),
     depth,
     range,
     total,
@@ -209,6 +218,7 @@ export function engineer(engineerId: string, range: DayRange): api.EngineerDetai
       name: subject.name,
       orgUnit: { id: subject.orgUnitId, name: ORG_UNITS[subject.orgUnitId] },
     },
+    chain: chainAbove(subject.id),
     range,
     harnesses: [
       { harness: 'claude-code', activeDays: 17 },

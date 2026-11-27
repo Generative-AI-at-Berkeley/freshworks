@@ -19,3 +19,10 @@ export function lastDays(days: number = DEFAULT_RANGE_DAYS, now: Date = new Date
   from.setUTCDate(from.getUTCDate() - days);
   return { from: isoDay(from), to: isoDay(to) };
 }
+
+/** Whole days in a range, `to` exclusive. */
+export function daysIn(range: DayRange): number {
+  return Math.round(
+    (Date.parse(`${range.to}T00:00:00Z`) - Date.parse(`${range.from}T00:00:00Z`)) / 86_400_000,
+  );
+}

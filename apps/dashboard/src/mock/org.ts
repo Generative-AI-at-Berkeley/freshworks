@@ -49,6 +49,18 @@ export function subtree(managerId: string): MockPerson[] {
   return directReports(managerId).flatMap((report) => [report, ...subtree(report.id)]);
 }
 
+/** Managers above someone, top first. */
+export function chainAbove(id: string): { id: string; name: string }[] {
+  const chain: { id: string; name: string }[] = [];
+  for (let current = person(id); current?.managerId;) {
+    const manager = person(current.managerId);
+    if (!manager) break;
+    chain.unshift({ id: manager.id, name: manager.name });
+    current = manager;
+  }
+  return chain;
+}
+
 export function isOrgUnitId(id: string): id is OrgUnitId {
   return Object.hasOwn(ORG_UNITS, id);
 }
