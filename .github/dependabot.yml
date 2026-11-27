@@ -31,9 +31,8 @@ updates:
       actions:
         patterns: ['*']
 
-  # Postgres and dbmate images in docker-compose.yml. The Dockerfile's base
-  # image is pinned through NODE_VERSION, which Dependabot cannot follow, so
-  # bump it by hand with .nvmrc.
+  # Postgres and dbmate images in docker-compose.yml. The Node base images
+  # are in the docker entry below.
   - package-ecosystem: docker-compose
     directory: /
     schedule:
@@ -45,4 +44,20 @@ updates:
       # A Postgres major is a planned upgrade (dump and restore, CI image,
       # docs), not a weekly bump.
       - dependency-name: postgres
+        update-types: [version-update:semver-major]
+
+  # The node:24-slim digest in both Dockerfiles. A Node major is a planned
+  # upgrade with .nvmrc and engines, not a weekly bump.
+  - package-ecosystem: docker
+    directories: [/, /apps/dashboard]
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: deps
+    groups:
+      node-base:
+        patterns: ['node']
+    ignore:
+      - dependency-name: node
         update-types: [version-update:semver-major]

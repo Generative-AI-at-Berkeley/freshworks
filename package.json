@@ -40,6 +40,7 @@
     "demo:down": "tsx --env-file-if-exists=.env --conditions=@fwcoach/source scripts/demo/main.ts down"
   },
   "devDependencies": {
+    "@changesets/cli": "3.0.3",
     "@eslint/js": "10.0.1",
     "@fwcoach/contracts": "workspace:*",
     "@fwcoach/testkit": "workspace:*",

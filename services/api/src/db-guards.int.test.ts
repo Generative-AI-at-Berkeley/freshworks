@@ -9,8 +9,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
  */
 
 // Owner to create the scratch table (services cannot), service user for the rest.
-const ownerUrl = process.env.DATABASE_URL;
-const appUrl = process.env.APP_DATABASE_URL;
+const ownerUrl = process.env['DATABASE_URL'];
+const appUrl = process.env['APP_DATABASE_URL'];
 
 async function failure(query: Promise<unknown>): Promise<{ code?: string; message: string }> {
   try {

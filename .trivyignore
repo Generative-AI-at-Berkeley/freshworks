@@ -1,0 +1,7 @@
+# Fixable HIGH or CRITICAL findings the image scan in ci.yml lets through.
+# Fix the image first (bump the base digest, upgrade the package). An entry is
+# a last resort and needs a reason and an expiry, after which Trivy reports
+# the finding again:
+#
+#   # Not reachable: <why>. Owner: <ticket>.
+#   CVE-0000-00000 exp:2026-12-31

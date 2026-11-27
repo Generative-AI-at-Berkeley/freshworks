@@ -46,6 +46,25 @@ pinned exactly (`.npmrc` sets `save-exact`). Dependabot opens weekly grouped
 updates. The dependency review check blocks high-severity advisories and
 copyleft licences.
 
+## Changesets
+
+A PR that changes what a package does adds a changeset. Each package gets its
+own version and `CHANGELOG.md`.
+
+1. Run `pnpm changeset`.
+2. Pick the packages you changed and the bump: `patch` for a fix, `minor` for
+   something new, `major` for a break (a contract change other code must
+   follow).
+3. Write one line a reader of the changelog would understand.
+4. Commit the new file in `.changeset/` with the rest of the PR.
+
+Tests, docs and CI changes do not need one.
+
+To release, a maintainer runs `pnpm changeset version`, opens a `chore:` PR
+with the bumps and changelogs, merges it, then tags `main` with `vX.Y.Z` and
+pushes the tag. The release workflow publishes the images to GHCR with
+provenance and an SBOM.
+
 ## Using AI tools
 
 Encouraged, with the same bar as hand-written code: you own every line, you
