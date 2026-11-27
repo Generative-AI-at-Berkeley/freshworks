@@ -9,6 +9,15 @@
   width: 11rem;
 }
 
+/*
+ * Dew's table header is sticky at z-index 10. The menu's positioner is
+ * transformed, which traps any z-index set inside it, so it goes on the
+ * positioner itself.
+ */
+:global([role='presentation']):has(> .toolPopup) {
+  z-index: 20;
+}
+
 .insightList {
   margin: 0;
   padding: 0;

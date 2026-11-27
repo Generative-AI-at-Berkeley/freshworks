@@ -289,6 +289,7 @@ function SkillsTable({ rows, days }: { rows: readonly SkillRow[]; days: number }
           <div className={styles.toolSelect}>
             <Select
               aria-label="Filter by tool"
+              classNames={{ popup: styles.toolPopup }}
               options={toolOptions}
               value={toolOptions.find((option) => option.value === harness) ?? toolOptions[0]}
               onValueChange={(option) => {
