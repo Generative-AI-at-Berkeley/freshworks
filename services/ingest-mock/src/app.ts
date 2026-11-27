@@ -9,7 +9,7 @@ export interface AppOptions {
   store: EventStore;
   /** Fastify logger setting. Tests pass false. */
   logger?: boolean;
-  /** Largest request body accepted, in bytes. TODO(BE-2): match the real pipeline once Freshworks shares it. */
+  /** Largest request body accepted, in bytes. TODO(BE-1): match the real pipeline once Freshworks shares it. */
   bodyLimit?: number;
 }
 
@@ -31,7 +31,7 @@ export function buildApp({
     const deviceId = authenticate(request.headers.authorization);
     if (deviceId === null) return problem(reply, 401, 'Missing or invalid bearer token.');
 
-    // TODO(BE-2): per-device rate and burst limits. Answer 429 with a
+    // TODO(BE-1): per-device rate and burst limits. Answer 429 with a
     // Retry-After header in seconds, and test the collector against it.
 
     const parsed = OtlpLogsRequest.safeParse(request.body);
@@ -54,22 +54,22 @@ export function buildApp({
         };
   });
 
-  // TODO(BE-2): mock the device flow the collector reuses (see
+  // TODO(BE-1): mock the device flow the collector reuses (see
   // docs/contracts/ingest.md). Registration exchanges the Jamf-provisioned
   // credential for a device ID and a rotating credential; rotation issues the
   // next one before the current expires.
   app.post('/v1/devices/register', (_request, reply) =>
-    problem(reply, 501, 'Not implemented (BE-2).'),
+    problem(reply, 501, 'Not implemented (BE-1).'),
   );
   app.post('/v1/devices/credential', (_request, reply) =>
-    problem(reply, 501, 'Not implemented (BE-2).'),
+    problem(reply, 501, 'Not implemented (BE-1).'),
   );
 
   return app;
 }
 
 /**
- * TODO(BE-2): verify the rotating device credential and map it to the
+ * TODO(BE-1): verify the rotating device credential and map it to the
  * engineer and device it was issued to. Until then any bearer token is
  * accepted, and the device ID is a hash of it. Never the token itself: the
  * device ID is logged and stored.

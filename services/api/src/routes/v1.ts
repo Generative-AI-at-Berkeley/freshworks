@@ -19,13 +19,13 @@ declare module 'fastify' {
  * Keep docs/api.md in step with this file.
  */
 const routes = [
-  { url: '/me/data', ticket: 'BE-4' },
+  { url: '/me/data', ticket: 'BE-2' },
   { url: '/org/:orgUnitId/overview', ticket: 'BE-3' },
   { url: '/leaders/:managerId/rollup', ticket: 'BE-3' },
-  { url: '/engineers/:engineerId', ticket: 'BE-4' },
-  { url: '/admin/access-log', ticket: 'BE-4' },
+  { url: '/engineers/:engineerId', ticket: 'BE-2' },
+  { url: '/admin/access-log', ticket: 'BE-2' },
   { url: '/skills/adoption', ticket: 'BE-3' },
-  { url: '/fleet/health', ticket: 'BE-3' },
+  { url: '/fleet/health', ticket: 'BE-4' },
 ] as const;
 
 /**

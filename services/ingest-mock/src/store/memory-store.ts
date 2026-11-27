@@ -3,7 +3,7 @@ import type { DeliveryMessage } from '@fwcoach/contracts';
 import type { EventStore, StoreResult } from './types.js';
 
 /**
- * For unit tests. TODO(BE-2): PostgresEventStore. In one transaction, claim
+ * For unit tests. TODO(BE-1): PostgresEventStore. In one transaction, claim
  * each msg_id in the unpartitioned `app.ingest_msg` table with
  * `insert ... on conflict (msg_id) do nothing returning msg_id`, then insert
  * only the claimed events into the partitioned `app.event`. See

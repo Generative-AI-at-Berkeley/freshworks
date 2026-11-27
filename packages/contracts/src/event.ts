@@ -86,7 +86,7 @@ function variant<T extends EventType, D extends z.ZodType>(type: T, data: D) {
  * One v2 event. Discriminated on `event_type`, so `event.data` narrows after a
  * check on the type.
  *
- * TODO(X-1): replace each `unmodelledData` with a real schema in events/ and
+ * TODO(AG-2, AG-3): replace each `unmodelledData` with a real schema in events/ and
  * add its fixture.
  */
 export const TelemetryEvent = z.discriminatedUnion('event_type', [

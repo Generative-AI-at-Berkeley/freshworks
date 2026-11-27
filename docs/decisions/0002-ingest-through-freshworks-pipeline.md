@@ -29,7 +29,7 @@ flow. Freshworks then told us they already run a telemetry pipeline for this:
   cadence, idempotency and rate-limit behaviour, and develop against it.
 - Real endpoints and credentials stay in a Freshworks repo and reach us as
   configuration.
-- Fields we need go to Freshworks as a proposal (X-1) and travel under
+- Fields we need go to Freshworks as a proposal (AG-4) and travel under
   `ext.fwcoach` until accepted.
 - The query API is ours, with OIDC for people, as the spec describes.
 

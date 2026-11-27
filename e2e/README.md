@@ -1,6 +1,7 @@
 # e2e
 
-The acceptance criteria from spec 7.7 as tests. Owned by **X-2**.
+The acceptance criteria from spec 7.7 as tests. Every ticket owns its own checks here, tagged with its ID.
+AG-1 owns the runner and the synthetic traffic.
 
 ```sh
 docker compose up -d --wait
@@ -9,5 +10,5 @@ docker compose down -v
 ```
 
 CI runs this on every PR (the `e2e` job in `.github/workflows/ci.yml`),
-which also proves the images build and the stack comes up healthy. Until X-2
-lands, the todos show what is left.
+which also proves the images build and the stack comes up healthy. Until each
+ticket lands, its todos show what is left.

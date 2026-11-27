@@ -23,16 +23,16 @@ flowchart LR
 
 ## Layout
 
-| Path                   | What                                                    | Owner        |
-| ---------------------- | ------------------------------------------------------- | ------------ |
-| `packages/contracts`   | v2 payload as Zod schemas, OTLP encoding, fixtures      | X-1, both    |
-| `packages/collector`   | The local agent: adapters, policy, buffer, uploader     | Agent team   |
-| `packages/testkit`     | Synthetic org trees and synthetic traffic               | BE-4, X-2    |
-| `services/ingest-mock` | Stand-in for the Freshworks pipeline                    | BE-2         |
-| `services/api`         | Query API, rollup jobs, directory sync, pricing         | Backend team |
-| `db/migrations`        | Postgres schema as dbmate migrations                    | BE-1         |
-| `e2e`                  | Acceptance criteria as tests, against the compose stack | X-2          |
-| `docs`                 | Architecture, decisions, contracts, formats, runbooks   | Everyone     |
+| Path                   | What                                                    | Owner            |
+| ---------------------- | ------------------------------------------------------- | ---------------- |
+| `packages/contracts`   | v2 payload as Zod schemas, OTLP encoding, fixtures      | AG-2, AG-3, AG-4 |
+| `packages/collector`   | The local agent: adapters, policy, buffer, uploader     | Agent team       |
+| `packages/testkit`     | Synthetic org trees and synthetic traffic               | BE-2, AG-1       |
+| `services/ingest-mock` | Stand-in for the Freshworks pipeline                    | BE-1             |
+| `services/api`         | Query API, rollup jobs, directory sync, pricing         | Backend team     |
+| `db/migrations`        | Postgres schema as dbmate migrations                    | Backend team     |
+| `e2e`                  | Acceptance criteria as tests, against the compose stack | Every ticket     |
+| `docs`                 | Architecture, decisions, contracts, formats, runbooks   | Everyone         |
 
 ## Quick start
 

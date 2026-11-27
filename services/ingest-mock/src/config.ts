@@ -3,7 +3,7 @@ import { z } from 'zod';
 /** The only place ingest-mock reads the environment. */
 export const IngestConfig = z.object({
   port: z.coerce.number().int().default(4318),
-  /** Service user, not the owner. Unset means in-memory storage. TODO(BE-2): use it. */
+  /** Service user, not the owner. Unset means in-memory storage. TODO(BE-1): use it. */
   databaseUrl: z.string().startsWith('postgres').optional(),
 });
 export type IngestConfig = z.infer<typeof IngestConfig>;

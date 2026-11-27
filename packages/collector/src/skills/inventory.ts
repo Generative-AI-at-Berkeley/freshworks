@@ -26,7 +26,8 @@ export interface InstalledSkill {
  * harness: Claude skills and plugin skills, Cursor rules, Kiro steering files
  * and Powers, and repo-level instruction files.
  *
- * TODO(AG-3): implement for Claude Code and Cursor (P0). TODO(AG-4): Kiro.
+ * TODO(AG-4): implement for every harness (P0). Start with Claude skills:
+ * the spec calls them the biggest gap.
  * Works fully offline. Test against public skills installed on your own machine.
  */
 export interface SkillScanner {

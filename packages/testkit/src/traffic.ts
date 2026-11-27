@@ -17,7 +17,7 @@ export interface DeviceTraffic {
  * invocations, plus a few duplicates and one oversized event, so ingestion's
  * idempotency and rejection paths are exercised.
  *
- * TODO(X-2): implement. Validate every event with `TelemetryEvent.parse` and
+ * TODO(AG-1): implement. Validate every event with `TelemetryEvent.parse` and
  * build IDs with `eventId`, so this traffic has exactly the shape real
  * traffic has. Use fixed synthetic values for `device.os` and `os_version`,
  * never the host machine's.
@@ -27,5 +27,5 @@ export function generateDay(
   _day: string,
   _seed: number,
 ): DeviceTraffic[] {
-  throw new Error('generateDay not implemented (X-2)');
+  throw new Error('generateDay not implemented (AG-1)');
 }

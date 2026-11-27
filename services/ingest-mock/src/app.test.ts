@@ -53,5 +53,5 @@ describe('POST /v1/logs', () => {
     expect(store.messages.size).toBe(1);
   });
 
-  it.todo('answers 429 with Retry-After past the burst limit (BE-2)');
+  it.todo('answers 429 with Retry-After past the burst limit (BE-1)');
 });

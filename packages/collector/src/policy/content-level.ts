@@ -19,7 +19,7 @@ export type ContentLevel = (typeof ContentLevel)[keyof typeof ContentLevel];
  * Keys that carry content, paths or tool arguments, compared lowercased with
  * `_` and `-` removed. If one shows up in an event, an adapter mapped the
  * wrong field, and the event is dropped rather than sent. This is a backstop,
- * not the policy: TODO(X-1, AG-2) replace it with a per-event-type allowlist
+ * not the policy: TODO(AG-1) replace it with a per-event-type allowlist
  * once every event type has a schema. Until then, add a harness's names for
  * the same things here when you find them.
  */
@@ -80,8 +80,8 @@ export type PolicyResult =
  * Last check before an event enters the buffer. Scans everything an adapter
  * controls: `data`, `ext`, `msg`, and the session and repo blocks.
  *
- * TODO(AG-2): L0 should also strip tool names, skill IDs and file extensions
- * from `data`. Do it per event type once the data schemas exist (X-1).
+ * TODO(AG-1): L0 should also strip tool names, skill IDs and file extensions
+ * from `data`. Do it per event type once the data schemas exist (AG-2, AG-3).
  */
 export function applyPolicy(event: TelemetryEvent, level: ContentLevel): PolicyResult {
   if (level === ContentLevel.L2) {
